@@ -17,11 +17,15 @@ LARGEFONT = ("Verdana", 35)
 home_pic_location = '../Food Images/beef-gulasch-356793.jpg'
 search_pic_location = '../Food Images/egg-shop-fried-chicken.jpg'
 recipe_pic_location = '../Food Images/bubble-and-squeak-with-stilton.jpg'
+
+# track which and how many windows open (limited to 3)
+MAX_OPEN_RECIPES = 3
+# this tracks open recipe windows by name as key and image as value(images had to be avail in this file)
+open_recipes = {}
 class MyApp:
 
     @staticmethod
     def run():
-        # Runtime code goes here (remove pass)
         class tkinterApp(tk.Tk):
             """ setup main window
             got code from https://www.geeksforgeeks.org/tkinter-application-to-switch-between-different-page-frames/"""
@@ -60,7 +64,7 @@ class MyApp:
                 global frames
                 # __init__ function for class Tk
                 tk.Tk.__init__(self, *args, **kwargs)
-
+                self.geometry('800x500')
                 # creating a container
                 container = tk.Frame(self)
                 container.pack(side="top", fill="both", expand=True)
@@ -72,7 +76,7 @@ class MyApp:
 
                 # self.show_frame(Home)
                 # start on the homescreen
-                self.show_frame(Add)
+                self.show_frame(Search)
 
             # to display the current frame passed as
             # parameter
@@ -173,6 +177,19 @@ class MyApp:
                         Search.user_last_filter = checkBoxStatus()  # save last used filter
                     entry_search_text.delete(0, tk.END)  # clear search box
 
+                def checkPages(name, recipe_pages: dict, max_pages_open):
+                    can_open = True
+                    cant_open_str = f'cant open {name} - '
+                    if name in recipe_pages.keys():  # if recipe page already open or
+                        can_open = False
+                        cant_open_str += 'recipe already open/ '
+                    if len(recipe_pages) == max_pages_open:  # if max number of pages open
+                        can_open = False
+                        cant_open_str += 'max number of recipes opened/ close a window to see recipe'
+                    if not can_open:
+                        print(cant_open_str)
+                    return can_open
+
                 def recipeSelect(event):  # search page
                     """ opens recipe clicked"""  # opens to recipe screen
 
@@ -181,22 +198,20 @@ class MyApp:
                     print(selected_item, '<-----------------')
                     # Do something with the selected item
                     try:
-                        selected_item = db_query_functions.getRecipeInfo(recipe_id=rows[selected_item[0]][0],
+                        selected_recipe = db_query_functions.getRecipeInfo(recipe_id=rows[selected_item[0]][0],
                                                                          db_connection_str=test_db_str,
                                                                          unique_ingreds=db_query_functions.getRowsAll(
                                                                              'Ingredient', test_db_str))
-                        recipe_info = selected_item[0]
-                        image_blob = selected_item[1]
-                        pp.pprint(recipe_info)
+                        print(type(selected_recipe[1]))
+                        pp.pprint(selected_recipe[0])
                         # SET UP RECIPE SCREEN
                         # using toplevl screens so can delete this and make new func to create topscreen
-                        recipe_page = app.addFrame(RecipePage.Recipe,app.frames,
-                                                 recipe_info['name'],
-                                                 recipe_info['ingredients'], recipe_info['instr'],
-                                                 recipe_pic_location)
-                        print(f'outside addFrame() - {app.frames} <----------')
-                        #app.show_frame('Recipe')  # switch to recipe screen
-                        print('-' * 100)
+                        open_recipe_page = checkPages(selected_recipe[0]['name'],open_recipes,MAX_OPEN_RECIPES)
+                        if open_recipe_page: # can show recipe
+                            recipe_page = RecipePage.Recipe(selected_recipe[0], selected_recipe[1])
+                            print('-' * 100)
+
+
                     except IndexError as e:  # if go button pressed while curser isnt on a recipe
                         print(e)
                         pass
