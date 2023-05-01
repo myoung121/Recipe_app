@@ -1,11 +1,5 @@
 """
-how to make recipe page:
-when clicked it should call the recipe class and add to frames in main tkinterApp obj and show page
-
-    list class on sepeate fiile
-    make function to add to tkinterApp frames dict
-    make function to remove page from dict after user leaves page
-
+RECIPE PAGE
 """
 
 

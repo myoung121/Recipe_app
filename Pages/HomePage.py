@@ -2,6 +2,7 @@
 
 import tkinter as tk
 from PIL import Image, ImageTk
+from Pages import HelpPage
 class Home(tk.Frame):
     def __init__(self, parent, controller, navigation_pages:dict):
         self.PAGE_NAME = 'HOME'
@@ -33,7 +34,7 @@ class Home(tk.Frame):
         btn_search.grid(row=1, column=0, padx=5)
         btn_add = tk.Button(frame_btn, text='add', command=lambda: controller.show_frame(navigation_pages['add']))
         btn_add.grid(row=1, column=1, padx=5)
-        btn_help = tk.Button(frame_btn, text='help', command=lambda: controller.show_frame(navigation_pages['help']))
+        btn_help = tk.Button(frame_btn, text='help', command=lambda: HelpPage.Help())
         btn_help.grid(row=1, column=2, padx=5)
         btn_quit = tk.Button(frame_btn, text='quit',command=lambda:exit('QUIT'))
         btn_quit.grid(row=1, column=3, padx=5)

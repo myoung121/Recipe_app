@@ -3,13 +3,13 @@
 import tkinter as tk
 import pprint as pp
 from tkinter import scrolledtext
+from Pages import HelpPage
 
 class Add(
     tk.Frame):
 
     def __init__(self, parent, controller, navigation_dict):
         tk.Frame.__init__(self, parent)
-
         # FUNCTIONS
 
         def addIngred(event):
@@ -109,7 +109,7 @@ class Add(
         btn_save = tk.Button(self, text='save', command=addRecipe)
         btn_save.grid(row=2, column=0)
 
-        btn_help = tk.Button(frame_navigation, text='help', command=lambda: controller.show_frame(navigation_dict['help']))
+        btn_help = tk.Button(frame_navigation, text='help', command=lambda: HelpPage.Help())
         btn_help.grid(row=0, column=0)
         btn_home = tk.Button(frame_navigation, text='home', command=lambda: controller.show_frame(navigation_dict['home']))
         btn_home.grid(row=0, column=1)

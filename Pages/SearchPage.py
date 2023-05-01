@@ -4,7 +4,7 @@ from tkinter import messagebox
 import pprint as pp
 from PIL import Image, ImageTk
 from Functions import db_query_functions
-from Pages import RecipePage
+from Pages import RecipePage, HelpPage
 
 
 class Search(tk.Frame):
@@ -153,7 +153,7 @@ class Search(tk.Frame):
         frame_side_btns.grid(row=2, column=2)
 
         # BUTTONS
-        btn_help = tk.Button(frame_navigate, text='help', command=lambda: controller.show_frame(navigation_dict['help']))
+        btn_help = tk.Button(frame_navigate, text='help', command=lambda: HelpPage.Help())
         btn_help.grid(row=0, column=0)
         btn_add = tk.Button(frame_navigate, text='add', command=lambda: controller.show_frame(navigation_dict['add']))
         btn_add.grid(row=0, column=1)
