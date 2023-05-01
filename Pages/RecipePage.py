@@ -18,9 +18,9 @@ import application as app
 class Recipe(tk.Toplevel):
 
     def closePage(self,name):
-        print(app.open_recipes)
+        #print(app.open_recipes)
         del app.open_recipes[name]
-        print(app.open_recipes)
+        #print(app.open_recipes)
         self.destroy()
 
 
@@ -73,7 +73,7 @@ class Recipe(tk.Toplevel):
         lbl_pic.grid(row=0, column=0)
         # ENTRY
         entry_recipe_note = tk.Entry(frame_note,
-                                     borderwidth=4)  # should be a tall text box with info in field with optioon to edit when window opened
+                                     borderwidth=4)
         entry_recipe_note.grid(row=0, column=0, pady=0)
         # SCROLLED TEXT
         # Creating scrolled text area

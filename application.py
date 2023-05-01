@@ -1,25 +1,19 @@
 import logging
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
-
 from PIL import Image, ImageTk
-
+from Functions import db_query_functions
 import Pages.HomePage
 from Pages import RecipePage
-from Functions import db_query_functions
-import sqlite3
 import pprint as pp
 
 
 log = logging.getLogger(__name__)
-test_db_str = '../food_stuff_tester.db' # database connection path
-LARGEFONT = ("Verdana", 35)
+test_db_str = './food_stuff_tester.db' # database connection path
+home_pic_location = './food images/beef-gulasch-356793.jpg'
+search_pic_location = './food images/egg-shop-fried-chicken.jpg'
 
-home_pic_location = '../Food Images/beef-gulasch-356793.jpg'
-search_pic_location = '../Food Images/egg-shop-fried-chicken.jpg'
-recipe_pic_location = '../Food Images/bubble-and-squeak-with-stilton.jpg'
-
-# track which and how many windows open (limited to 3)
+# track how many windows open
 MAX_OPEN_RECIPES = 3
 # this tracks open recipe windows by name as key and image as value(images had to be avail in this file)
 open_recipes = {}
@@ -34,31 +28,18 @@ class MyApp:
             frames = {}
 
             # __init__ function for class tkinterApp
-            def makeFrames(self, list_of_frames, frames_args_tuple,parent):  # build frames dict
+            def makeFrames(self, list_of_frames, frames_args:tuple,parent):  # build frames dict
                 # initializing frames to an empty array
                 frame_dict = {}
                 # iterating through a tuple consisting
                 # of the different page layouts
                 for num,F in enumerate(list_of_frames):
                     # initializing frame of that object
-                    frame = F(parent, self,frames_args_tuple[num],home_pic_location)
+                    frame = F(parent, self,frames_args[num])
                     frame_dict[F] = frame
                     frame.grid(row=0, column=0, sticky="nsew")
-                print(frame_dict)
+                #print(frame_dict)
                 return frame_dict
-
-            """def addFrame(self, new_frame_obj, current_frames, *recipe_args) -> dict:
-                container = tk.Frame()
-                container.pack(side="top", fill="both", expand=True)
-                print(f'before {current_frames}')
-                container.grid_rowconfigure(0, weight=1)
-                container.grid_columnconfigure(0, weight=1)
-                frame = new_frame_obj(self, *recipe_args)
-                current_frames['Recipe'] = frame
-                print(f'after {current_frames}')
-                frame.grid(row=0, column=0, sticky="nsew")
-                app.update()
-                return frame"""
 
             def __init__(self, *args, **kwargs):
                 global container
@@ -72,11 +53,11 @@ class MyApp:
 
                 container.grid_rowconfigure(0, weight=1)
                 container.grid_columnconfigure(0, weight=1)
-                home_nav = {'search':Search,'add':Add,'help':Help}
-                self.frames = self.makeFrames((Pages.HomePage.Home,),(home_nav,), parent=container)
-                #self.frames = self.makeFrames((Home, Search, Add), parent=container)
+                home_nav = {'search':Search,'add':Add,'help':Help,'pic':home_pic_location}
+                #self.frames = self.makeFrames((Pages.HomePage.Home,),(home_nav,), parent=container)
+                self.frames = self.makeFrames((Pages.HomePage.Home, Search, Add), (home_nav,{},{}),parent=container)
 
-                # start on the home PAGE
+                # start on the home page
                 self.show_frame(Pages.HomePage.Home)
                 self.title('RecipeApp 1.0')
 
@@ -86,56 +67,12 @@ class MyApp:
                 frame = self.frames[cont]
                 frame.tkraise()
 
-        """class Home(tk.Frame):
-            # home_pic_location = '../Food Images/beef-gulasch-356793.jpg'
-
-            def __init__(self, parent, controller):
-                global home_photo
-
-                tk.Frame.__init__(self, parent)
-
-                # label of frame Layout 2
-                # label = ttk.Label(self, text="Home", font=LARGEFONT)
-                # FRAME
-
-                frame_pic = tk.Frame(self, padx=0, pady=0)
-                frame_pic.grid(row=1, column=0)
-
-                frame_btn = tk.Frame(self, padx=0, pady=0)
-                # frame_btn.columnconfigure(3,minsize=frame_width)
-                # frame_btn.rowconfigure(5,minsize=frame_height)
-                frame_btn.grid(row=2, column=0, padx=0, pady=0)
-
-                # BUTTONS
-                btn_search = tk.Button(frame_btn, text='search', command=lambda: controller.show_frame(Search))
-                btn_search.grid(row=1, column=0, padx=5)
-
-                btn_add = tk.Button(frame_btn, text='add', command=lambda: controller.show_frame(Add))
-                btn_add.grid(row=1, column=1, padx=5)
-
-                btn_help = tk.Button(frame_btn, text='help', command=lambda: controller.show_frame(Help))
-                btn_help.grid(row=1, column=2, padx=5)
-
-                btn_quit = tk.Button(frame_btn, text='quit')
-                btn_quit.grid(row=1, column=3, padx=5)
-
-                #  LABELS
-                # lbl_title = tk.Label(master=window, text='Enter Message Here')
-                # lbl_title.pack()
-                image = Image.open(home_pic_location)
-                home_photo = ImageTk.PhotoImage(image)
-                lbl_pic = tk.Label(frame_pic, image=home_photo)
-                lbl_pic.pack()
-
-                lbl_title = tk.Label(self, text='welcome to cookbook app')
-                lbl_title.grid(row=0, column=0)
-        """
         class Search(tk.Frame):
             rows = []
             user_last_search_str = ''  # users last searched words
             user_last_filter = 'name'  # users last filter applied
 
-            def __init__(self, parent, controller):
+            def __init__(self, parent, controller,navigation_dict):
                 tk.Frame.__init__(self, parent)
                 global search_photo
 
@@ -197,18 +134,16 @@ class MyApp:
 
                     # Get the selected item in the list
                     selected_item = l_box_search.curselection()
-                    print(selected_item, '<-----------------')
                     # Do something with the selected item
                     try:
                         selected_recipe = db_query_functions.getRecipeInfo(recipe_id=rows[selected_item[0]][0],
                                                                          db_connection_str=test_db_str,
                                                                          unique_ingreds=db_query_functions.getRowsAll(
                                                                              'Ingredient', test_db_str))
-                        print(type(selected_recipe[1]))
-                        pp.pprint(selected_recipe[0])
+                        #pp.pprint(selected_recipe[0])
                         # SET UP RECIPE SCREEN
-                        # using toplevl screens so can delete this and make new func to create topscreen
-                        open_recipe_page = checkPages(selected_recipe[0]['name'],open_recipes,MAX_OPEN_RECIPES)
+                        # using toplevel screens
+                        open_recipe_page = checkPages(selected_recipe[0]['name'],open_recipes,MAX_OPEN_RECIPES) # check if allowed to open a new window
                         if open_recipe_page: # can show recipe
                             recipe_page = RecipePage.Recipe(selected_recipe[0], selected_recipe[1])
                             print('-' * 100)
@@ -277,8 +212,8 @@ class MyApp:
                 btn_help.grid(row=0, column=0)
                 btn_add = tk.Button(frame_navigate, text='add', command=lambda: controller.show_frame(Add))
                 btn_add.grid(row=0, column=1)
-                #btn_home = tk.Button(frame_navigate, text='home', command=lambda: controller.show_frame(Home))
-                #btn_home.grid(row=0, column=2)
+                btn_home = tk.Button(frame_navigate, text='home', command=lambda: controller.show_frame(Pages.HomePage.Home))
+                btn_home.grid(row=0, column=2)
                 btn_quit = tk.Button(frame_navigate, text='quit', command=lambda: exit('QUIT'))
                 btn_quit.grid(row=0, column=3)
 
@@ -322,7 +257,6 @@ class MyApp:
                 entry_search_text.bind('<Return>', search)
 
                 # CHECKBOX
-                # CAN USE chk_bx.deselect() to make sure only on is checked
                 recipe_toggle = tk.IntVar()
                 chk_bx_recipe = tk.Checkbutton(frame_toggles, text='recipe_id',
                                                variable=recipe_toggle, command=lambda: checkBoxControl(chk_bx_recipe))
@@ -349,9 +283,9 @@ class MyApp:
         # -------------
 
         class Add(
-            tk.Frame):  # save butto needs to clear saved_ingreds or old ingreds will still be thr. and make function to clear before leaving add page
+            tk.Frame):
 
-            def __init__(self, parent, controller):
+            def __init__(self, parent, controller,navigation_dict):
                 tk.Frame.__init__(self, parent)
 
                 # FUNCTIONS
@@ -453,8 +387,8 @@ class MyApp:
 
                 btn_help = tk.Button(frame_navigation, text='help', command=lambda: controller.show_frame(Help))
                 btn_help.grid(row=0, column=0)
-                #btn_home = tk.Button(frame_navigation, text='home', command=lambda: controller.show_frame(Home))
-                #btn_home.grid(row=0, column=1)
+                btn_home = tk.Button(frame_navigation, text='home', command=lambda: controller.show_frame(Pages.HomePage.Home))
+                btn_home.grid(row=0, column=1)
                 btn_quit = tk.Button(frame_navigation, text='quit', command=lambda: exit('QUIT'))
                 btn_quit.grid(row=0, column=2)
 

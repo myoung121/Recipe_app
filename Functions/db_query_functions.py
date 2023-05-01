@@ -1,5 +1,4 @@
 import random as ran
-import pprint as pp
 import sqlite3
 """ FUNCTIONS THAT RETURN A SINGLE FORMATED RECIPE"""
 
@@ -8,7 +7,6 @@ def getRecipeInfo(recipe_id: int, db_connection_str:str, unique_ingreds: list) -
     table_names: tuple = ('Recipe', 'RecipeIngredient', 'Image')
     recipe_info = {}
     db_connection_str = sqlite3.connect(db_connection_str)
-    # print('in getRecipeInfo')
     for item_rows in table_names:
         try:
 
@@ -19,7 +17,6 @@ def getRecipeInfo(recipe_id: int, db_connection_str:str, unique_ingreds: list) -
                 with db_connection_str:
                     stats = db_connection_str.execute(execute_script_str)
                     stats = stats.fetchall()[0]
-                    # print(item_rows, stats)
                 recipe_info['recipe_id'] = stats[0]
                 recipe_info['name'] = stats[1].replace('_', ' ').title()
                 recipe_info['instr'] = stats[2]
@@ -33,20 +30,16 @@ def getRecipeInfo(recipe_id: int, db_connection_str:str, unique_ingreds: list) -
                 with db_connection_str:
                     stats = db_connection_str.execute(execute_script_str)
                     stats = stats.fetchall()
-                    # print(item_rows, stats)
                 for num, food in enumerate(stats):
                     recipe_info['ingredients'].append(unique_ingreds[int(food[1])][1])
             elif item_rows == 'Image':
                 with db_connection_str:
                     stats = db_connection_str.execute(execute_script_str)
                     stats = stats.fetchall()[0]
-                # print(item_rows, stats)
                 recipe_info['image_name'] = stats[2].replace('_', " ").title()
                 image_blob = stats[3]
         except Exception as e:
             print(f'Error in getRecipeInfo():\n{e}')
-    #pp.pprint(recipe_info)
-    # print('out getRecipeInfo')
     return recipe_info, image_blob
 
 
@@ -102,7 +95,7 @@ def getRowsFiltered(search_txt, db_connection_str:str, user_filter: str= 'name',
 
 
 def getRowsAll(table_name: str, db_connection_str:str) -> list:
-    # return all rows in database
+    """ return all rows in database """
     execute_script = f'SELECT * FROM ' + str(table_name)
     db_connection_str = sqlite3.connect(db_connection_str)
     with db_connection_str:
@@ -111,15 +104,6 @@ def getRowsAll(table_name: str, db_connection_str:str) -> list:
 
 
 # --------------------------------------------------------------
-def convertToBinaryData(filename):
-    """Convert digital data to binary format"""
-    try:
-        with open(filename, 'rb') as file:
-            blobData = file.read()
-        return blobData
-    except FileNotFoundError as e:
-        exit(str(e) + ' in convertToBinaryData')
-
 """FUNCTIONS THAT ALTER DB INFO"""
 
 
@@ -145,7 +129,6 @@ def deleteRecipe(recipe_id:int,db_connection_str:str):
     """delete recipe record from database"""
     db_connection_str = sqlite3.connect(db_connection_str)
     delete_tables = ('Recipe','RecipeIngredient','Image')
-    #todo - finish query to delete record from the tables above
     for table in delete_tables:
         execute_script = f'DELETE FROM {str(table)} WHERE recipe_id={recipe_id}'
         with db_connection_str:

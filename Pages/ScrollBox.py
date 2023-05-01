@@ -15,11 +15,7 @@ class ScrollTextBox(tk.Frame):
         self.t_box_width = t_box_width_max
         self.t_box_height = t_box_height_max
 
-        # create a Text widget
-        # xscrollcomannd is used to attach Text
-        # widget to the horizontal scrollbar
-        # yscrollcomannd is used to attach Text
-        # widget to the vertical scrollbar
+
 
         # create a horizontal scrollbar
         s_bar_hor = tk.Scrollbar(parent_frame, orient='horizontal')
@@ -28,13 +24,17 @@ class ScrollTextBox(tk.Frame):
 
         # create a vertical scrollbar
         s_bar_vert = tk.Scrollbar(parent_frame)
+
         # attach Scrollbar to text
         s_bar_vert.pack(side=tk.RIGHT, fill=tk.Y)
         if len(text_iter) < self.t_box_height:
             self.t_box_height = len(text_iter)
-        longest_str_len = max(map(lambda x:len(x),text_iter))
-        print(f'lonest str = {longest_str_len}')
 
+        # create a Text widget
+        # xscrollcomannd is used to attach Text
+        # widget to the horizontal scrollbar
+        # yscrollcomannd is used to attach Text
+        # widget to the vertical scrollbar
         text_box_info = tk.Text(parent_frame, width=self.t_box_width, height=self.t_box_height, wrap=tk.NONE,
                  xscrollcommand=s_bar_hor.set,
                  yscrollcommand=s_bar_vert.set)
