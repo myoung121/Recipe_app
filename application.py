@@ -4,6 +4,7 @@ from tkinter import messagebox, scrolledtext
 
 from PIL import Image, ImageTk
 
+import Pages.HomePage
 from Pages import RecipePage
 from Functions import db_query_functions
 import sqlite3
@@ -33,20 +34,20 @@ class MyApp:
             frames = {}
 
             # __init__ function for class tkinterApp
-            def makeFrames(self, list_of_frames, parent):  # build frames dict
+            def makeFrames(self, list_of_frames, frames_args_tuple,parent):  # build frames dict
                 # initializing frames to an empty array
                 frame_dict = {}
                 # iterating through a tuple consisting
                 # of the different page layouts
-                for F in list_of_frames:
+                for num,F in enumerate(list_of_frames):
                     # initializing frame of that object
-                    frame = F(parent, self)
+                    frame = F(parent, self,frames_args_tuple[num],home_pic_location)
                     frame_dict[F] = frame
                     frame.grid(row=0, column=0, sticky="nsew")
                 print(frame_dict)
                 return frame_dict
 
-            def addFrame(self, new_frame_obj, current_frames, *recipe_args) -> dict:
+            """def addFrame(self, new_frame_obj, current_frames, *recipe_args) -> dict:
                 container = tk.Frame()
                 container.pack(side="top", fill="both", expand=True)
                 print(f'before {current_frames}')
@@ -57,7 +58,7 @@ class MyApp:
                 print(f'after {current_frames}')
                 frame.grid(row=0, column=0, sticky="nsew")
                 app.update()
-                return frame
+                return frame"""
 
             def __init__(self, *args, **kwargs):
                 global container
@@ -71,12 +72,13 @@ class MyApp:
 
                 container.grid_rowconfigure(0, weight=1)
                 container.grid_columnconfigure(0, weight=1)
+                home_nav = {'search':Search,'add':Add,'help':Help}
+                self.frames = self.makeFrames((Pages.HomePage.Home,),(home_nav,), parent=container)
+                #self.frames = self.makeFrames((Home, Search, Add), parent=container)
 
-                self.frames = self.makeFrames((Home, Search, Add), parent=container)
-
-                # self.show_frame(Home)
-                # start on the homescreen
-                self.show_frame(Search)
+                # start on the home PAGE
+                self.show_frame(Pages.HomePage.Home)
+                self.title('RecipeApp 1.0')
 
             # to display the current frame passed as
             # parameter
@@ -84,7 +86,7 @@ class MyApp:
                 frame = self.frames[cont]
                 frame.tkraise()
 
-        class Home(tk.Frame):
+        """class Home(tk.Frame):
             # home_pic_location = '../Food Images/beef-gulasch-356793.jpg'
 
             def __init__(self, parent, controller):
@@ -127,7 +129,7 @@ class MyApp:
 
                 lbl_title = tk.Label(self, text='welcome to cookbook app')
                 lbl_title.grid(row=0, column=0)
-
+        """
         class Search(tk.Frame):
             rows = []
             user_last_search_str = ''  # users last searched words
@@ -275,8 +277,8 @@ class MyApp:
                 btn_help.grid(row=0, column=0)
                 btn_add = tk.Button(frame_navigate, text='add', command=lambda: controller.show_frame(Add))
                 btn_add.grid(row=0, column=1)
-                btn_home = tk.Button(frame_navigate, text='home', command=lambda: controller.show_frame(Home))
-                btn_home.grid(row=0, column=2)
+                #btn_home = tk.Button(frame_navigate, text='home', command=lambda: controller.show_frame(Home))
+                #btn_home.grid(row=0, column=2)
                 btn_quit = tk.Button(frame_navigate, text='quit', command=lambda: exit('QUIT'))
                 btn_quit.grid(row=0, column=3)
 
@@ -451,8 +453,8 @@ class MyApp:
 
                 btn_help = tk.Button(frame_navigation, text='help', command=lambda: controller.show_frame(Help))
                 btn_help.grid(row=0, column=0)
-                btn_home = tk.Button(frame_navigation, text='home', command=lambda: controller.show_frame(Home))
-                btn_home.grid(row=0, column=1)
+                #btn_home = tk.Button(frame_navigation, text='home', command=lambda: controller.show_frame(Home))
+                #btn_home.grid(row=0, column=1)
                 btn_quit = tk.Button(frame_navigation, text='quit', command=lambda: exit('QUIT'))
                 btn_quit.grid(row=0, column=2)
 
