@@ -35,12 +35,12 @@ class Help(tk.Toplevel):
 
 
         # ADD INFO
-        home_info=sBox.ScrollTextBox(tabs['home'],'add info here'.split(),numbered=False)
-        search_info=sBox.ScrollTextBox(tabs['search'], 'add info here'.split(),numbered=False)
-        add_info=sBox.ScrollTextBox(tabs['add'], 'add info here'.split(),numbered=False)
-        recipe_info=sBox.ScrollTextBox(tabs['recipe'], 'add info here'.split(),numbered=False)
-        app_info_info=sBox.ScrollTextBox(tabs['app_info'], 'add info here'.split(),numbered=False)
-        logs_info=sBox.ScrollTextBox(tabs['logs'], 'add info here'.split(),numbered=False)
+        home_info=sBox.ScrollTextBox(tabs['home'],'add info here'.split(),numbered=False,with_canvas=True)
+        search_info=sBox.ScrollTextBox(tabs['search'], 'add info here'.split(),numbered=False,with_canvas=True)
+        add_info=sBox.ScrollTextBox(tabs['add'], 'add info here'.split(),numbered=False,with_canvas=True)
+        recipe_info=sBox.ScrollTextBox(tabs['recipe'], 'add info here'.split(),numbered=False,with_canvas=True)
+        app_info_info=sBox.ScrollTextBox(tabs['app_info'], 'add info here'.split(),numbered=False,with_canvas=True)
+        logs_info=sBox.ScrollTextBox(tabs['logs'], 'add info here'.split(),numbered=False,with_canvas=True)
         # add tabs to notebook object
         for t in tabs.keys():
             tab_parent.add(tabs[t],text=t)

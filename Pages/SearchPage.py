@@ -81,9 +81,7 @@ class Search(tk.Frame):
             # Do something with the selected item
             try:
                 selected_recipe = db_query_functions.getRecipeInfo(recipe_id=rows[selected_item[0]][0],
-                                                                   db_connection_str=test_db_str,
-                                                                   unique_ingreds=db_query_functions.getRowsAll(
-                                                                       'Ingredient', test_db_str))
+                                                                   db_connection_str=test_db_str)
                 # pp.pprint(selected_recipe[0])
                 # SET UP RECIPE SCREEN
                 # using toplevel screens
@@ -95,19 +93,16 @@ class Search(tk.Frame):
 
 
             except IndexError as e:  # if go button pressed while curser isnt on a recipe
-                print(e)
                 pass
 
         def randomRecipe():
-            selected_item = db_query_functions.getRecipeInfoRandom(
-                num_recipes=len(db_query_functions.getRowsAll('Recipe', test_db_str)),
-                db_connection_str=test_db_str,
-                unique_ingreds=db_query_functions.getRowsAll('Ingredient', test_db_str))
-            recipe_info = selected_item[0]
-            image_blob = selected_item[1]
-            # controller.show_frame(Recipe)  # switch to recipe screen
-            pp.pprint(recipe_info)
-            print('-' * 100)
+            selected_item = db_query_functions.getRecipeInfoRandom(db_connection_str=test_db_str)
+            open_recipe_page = checkPages(selected_item[0]['name'], navigation_dict['open_pages'],
+                                          navigation_dict['max_pages'])  # check if allowed to open a new window
+            if open_recipe_page:  # can show recipe
+                recipe_page = RecipePage.Recipe(selected_item[0], selected_item[1])
+                print('-' * 100)
+
 
         def deleteRecipe():
             selected_item = l_box_search.curselection()
@@ -169,6 +164,8 @@ class Search(tk.Frame):
         btn_go.grid(row=0, column=0)
         btn_random = tk.Button(frame_side_btns, text='random', command=randomRecipe)
         btn_random.grid(row=0, column=1)
+        btn_favorites = tk.Button(frame_side_btns,text='favs')
+        btn_favorites.grid(row=0,column=2)
 
         btn_entry = tk.Button(frame_entry_w_btn, text='enter', command=search)
         btn_entry.grid(row=0, column=1)

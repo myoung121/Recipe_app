@@ -1,11 +1,12 @@
 import random as ran
 import sqlite3
-""" FUNCTIONS THAT RETURN A SINGLE FORMATED RECIPE"""
+""" FUNCTIONS THAT RETURN A SINGLE FORMATTED RECIPE"""
 
 
-def getRecipeInfo(recipe_id: int, db_connection_str:str, unique_ingreds: list) -> (dict, bytes):  # show recipe button
+def getRecipeInfo(recipe_id: int, db_connection_str:str) -> (dict, bytes):  # show recipe button
     table_names: tuple = ('Recipe', 'RecipeIngredient', 'Image')
     recipe_info = {}
+    unique_ingreds = getRowsAll('Ingredient',db_connection_str)
     db_connection_str = sqlite3.connect(db_connection_str)
     for item_rows in table_names:
         try:
@@ -43,9 +44,18 @@ def getRecipeInfo(recipe_id: int, db_connection_str:str, unique_ingreds: list) -
     return recipe_info, image_blob
 
 
-def getRecipeInfoRandom(num_recipes: int, db_connection_str:str, unique_ingreds: list) -> (dict, bytes):  # random recipe button
-    ran_recipe_num = ran.randint(0, int(num_recipes))
-    return getRecipeInfo(recipe_id=ran_recipe_num, db_connection_str=db_connection_str, unique_ingreds=unique_ingreds)
+def getRecipeInfoRandom(db_connection_str:str) -> (dict, bytes):  # random recipe button
+    # todo - chech todo.txt
+    # get all recipe_ids in table
+    execute_script = 'SELECT recipe_id FROM Recipe'
+    db_connection = sqlite3.connect(db_connection_str)
+    with db_connection:
+        all_ids = db_connection.execute(execute_script)
+    all_ids = all_ids.fetchall()
+    # pick a random recipe_id and get the id number alone
+    ran_recipe_num = ran.sample(all_ids,1)[0][0]
+    # pass recipe_id into function to get recipe info
+    return getRecipeInfo(recipe_id=ran_recipe_num, db_connection_str=db_connection_str)
 
 
 # -------------------------------------------------------------------------------
@@ -95,13 +105,37 @@ def getRowsFiltered(search_txt, db_connection_str:str, user_filter: str= 'name',
 
 
 def getRowsAll(table_name: str, db_connection_str:str) -> list:
-    """ return all rows in database """
+    """ return all rows in table """
     execute_script = f'SELECT * FROM ' + str(table_name)
     db_connection_str = sqlite3.connect(db_connection_str)
     with db_connection_str:
         all_rows = db_connection_str.execute(execute_script)
     return all_rows.fetchall()
 
+def getImageRandom(db_connection_str:str,num_of_images:int=1)->list:
+    """ return one or multiple random image and image name"""
+    # get all image_ids
+    execute_script = 'SELECT image_id from Image'
+    db_connection = sqlite3.connect(db_connection_str)
+    with db_connection:
+        image_ids = db_connection.execute(execute_script)
+    image_ids=image_ids.fetchall()
+    # get the number of random image_ids requested
+    ran_image_ids = ran.sample(image_ids,num_of_images)
+    # make new script to get images based on the selected image_ids
+    execute_script = 'SELECT image_name,image_blob FROM Image WHERE image_id IN '
+    # add placeholder for each image_id
+    placeholders_str = "(" + '?,' * num_of_images
+    placeholders_str = placeholders_str[:-1] + ")"
+    # put the script together
+    execute_script += placeholders_str
+    #db_connection_str = sqlite3.connect(db_connection_str)
+    with db_connection:
+        random_images = db_connection.execute(execute_script,tuple(x[0] for x in ran_image_ids))
+    random_images = random_images.fetchall()
+    #random_images = ran.sample(all_images,num_of_images)
+    return random_images
+    # todo - check if this runs correctly
 
 # --------------------------------------------------------------
 """FUNCTIONS THAT ALTER DB INFO"""

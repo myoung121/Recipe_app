@@ -8,7 +8,7 @@ class ScrollTextBox(tk.Frame):
 
     # constructor
     def __init__(self,parent_frame:tk.LabelFrame,text_iter,
-                 numbered=True,
+                 numbered=True,with_canvas=False,
                  t_box_height_max = 15,t_box_width_max = 50):
         # t_box_height_max is the max number of lines to show
         # t_box_width_max is the max number of letters to show
@@ -31,15 +31,26 @@ class ScrollTextBox(tk.Frame):
         if len(text_iter) < self.t_box_height:
             self.t_box_height = len(text_iter)
 
+        if with_canvas and 2==3: # use a canvas backround with pic
+            # create a Canvas widget
+            canvas = tk.Canvas(parent_frame, width=self.t_box_width, height=self.t_box_height)
+            canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+            # create a PhotoImage object from the image file
+            img = tk.PhotoImage(file="path/to/image.png")
+            # create an image item on the canvas
+            canvas.create_image(0, 0, image=img, anchor=tk.NW)
+            # create a Text widget on top of the canvas
+            text_box_info = tk.Text(canvas, width=self.t_box_width, height=self.t_box_height, wrap=tk.NONE,
+                                    xscrollcommand=s_bar_hor.set,
+                                    yscrollcommand=s_bar_vert.set)
+        else:
+            # create a Text widget
+            # xscrollcomannd is used to attach Text widget to the horizontal scrollbar
+            # yscrollcomannd is used to attach Text widget to the vertical scrollbar
+            text_box_info = tk.Text(parent_frame, width=self.t_box_width, height=self.t_box_height, wrap=tk.NONE,
+                     xscrollcommand=s_bar_hor.set,
+                     yscrollcommand=s_bar_vert.set)
 
-        # create a Text widget
-        # xscrollcomannd is used to attach Text
-        # widget to the horizontal scrollbar
-        # yscrollcomannd is used to attach Text
-        # widget to the vertical scrollbar
-        text_box_info = tk.Text(parent_frame, width=self.t_box_width, height=self.t_box_height, wrap=tk.NONE,
-                 xscrollcommand=s_bar_hor.set,
-                 yscrollcommand=s_bar_vert.set)
         # insert some text into the text widget
         for num,text in enumerate(text_iter):
             if numbered:
@@ -49,12 +60,18 @@ class ScrollTextBox(tk.Frame):
             text_box_info.insert(tk.END, text_str)
         # make text read only
         text_box_info.configure(state='disabled')
-        # attach Text widget
-        text_box_info.pack(side=tk.TOP, fill=tk.X)
-        # command represents the method to
-        # be executed xview is executed on
-        s_bar_hor.config(command=text_box_info.xview)
 
-        # command represents the method to
-        # be executed yview is executed on
-        s_bar_vert.config(command=text_box_info.yview)
+        if with_canvas and 2==3:
+            # attach Text widget to the canvas
+            canvas.create_window(0, 0, anchor=tk.NW, window=text_box_info)
+            # configure the Text widget's scrolling
+            s_bar_hor.config(command=canvas.xview)
+            s_bar_vert.config(command=canvas.yview)
+            canvas.configure(scrollregion=canvas.bbox(tk.ALL))
+        else:
+            # attach Text widget
+            text_box_info.pack(side=tk.TOP, fill=tk.X)
+            # command represents the method to be executed xview is executed on
+            s_bar_hor.config(command=text_box_info.xview)
+            # command represents the method to be executed yview is executed on
+            s_bar_vert.config(command=text_box_info.yview)
