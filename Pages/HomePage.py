@@ -1,5 +1,5 @@
 """HOME PAGE"""
-
+# todo - move nav buttons to top right like on other scrrens and have slideshow of random images below
 import tkinter as tk
 from PIL import Image, ImageTk
 from Pages import HelpPage

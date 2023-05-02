@@ -1,5 +1,7 @@
 import random as ran
 import sqlite3
+from PIL import Image, ImageTk
+import  io
 """ FUNCTIONS THAT RETURN A SINGLE FORMATTED RECIPE"""
 
 
@@ -26,6 +28,7 @@ def getRecipeInfo(recipe_id: int, db_connection_str:str) -> (dict, bytes):  # sh
                 recipe_info['comment'] = stats[5]
                 recipe_info['created_time'] = stats[6]
                 recipe_info['updated_time'] = stats[7]
+                recipe_info['favorite'] = stats[8]
             elif item_rows == 'RecipeIngredient':
                 recipe_info['ingredients'] = []
                 with db_connection_str:
@@ -134,7 +137,15 @@ def getImageRandom(db_connection_str:str,num_of_images:int=1)->list:
         random_images = db_connection.execute(execute_script,tuple(x[0] for x in ran_image_ids))
     random_images = random_images.fetchall()
     #random_images = ran.sample(all_images,num_of_images)
-    return random_images
+    # convert binary images to images tkinter can use
+    random_jpeg_images =[]
+    for image_pair in random_images:
+        sub_list = [image_pair[0]]
+        # convert image bytes to PIL image format(jpeg)
+        pic = Image.open(io.BytesIO(image_pair[1]))
+        sub_list.append(ImageTk.PhotoImage(pic))
+        random_jpeg_images.append(tuple(sub_list))
+    return random_jpeg_images
     # todo - check if this runs correctly
 
 # --------------------------------------------------------------

@@ -15,6 +15,9 @@ search_pic_location = './food images/egg-shop-fried-chicken.jpg'
 MAX_OPEN_RECIPES = 3
 # this tracks open recipe windows by name as key and image as value(images had to be avail in this file)
 open_recipes = {}
+
+# help page canvas images
+help_canvas = {}
 class MyApp:
 
     @staticmethod

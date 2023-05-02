@@ -220,4 +220,4 @@ class Search(tk.Frame):
                                        variable=instrs_toggle, command=lambda: checkBoxControl(chk_bx_instrs))
         chk_bx_instrs.grid(row=0, column=3, padx=5)
 
-        search()  # loads all recipes into  search box
+        #search()  # loads all recipes into  search box
