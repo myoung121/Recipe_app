@@ -20,10 +20,6 @@ class Search(tk.Frame):
         tk.Frame.__init__(self, parent)
         test_db_str = navigation_dict['db_str']
         # get a background image
-        print('Search BackGround ',end='')
-        bkrnd_image_info = dbFuncs.getImageRandom(test_db_str)[0]
-        self.bkrnd_image_name = bkrnd_image_info[0]
-        self.bkrnd_image = bkrnd_image_info[1]
         def checkBoxControl(box_var: tk.Checkbutton):  # search page
             """this function makes sure only one check box is selected at a time"""
             chk_boxes = [chk_bx_recipe, chk_bx_title, chk_bx_ingred, chk_bx_instrs]
@@ -59,9 +55,7 @@ class Search(tk.Frame):
             # Add items to the search listbox
             for item in rows:
                 item = list(item)
-                print(item)
                 item[1]=item[1].replace('_',' ')
-                print(item[1])
                 l_box_search.insert(tk.END, f'{item[0]}. {item[1].title()}')
             if entry_search_text.get():
                 Search.user_last_search_str = entry_search_text.get()  # save last searched word
