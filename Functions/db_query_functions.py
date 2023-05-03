@@ -192,3 +192,25 @@ def removeComment(recipe_id:int,db_connection)->None:
     # todo- should auto update the updated_at column
     return addComment(recipe_id=recipe_id,db_connection=db_connection,comment='')
 
+def toggleFav(recipe_id:int,db_connection)-> None:
+    """toggle recipe fav value between True and False"""
+    # get current fav value
+    execute_script = f'SELECT favorite from Recipe WHERE recipe_id = {recipe_id}'
+    db_connection = sqlite3.connect(db_connection)
+    with db_connection:
+        current_fav_value = db_connection.execute(execute_script)
+    current_fav_value = current_fav_value.fetchall()[0][0]
+    print(f'#{recipe_id} - current fav value is {current_fav_value}')
+    if current_fav_value:
+        new_fav_value = False
+    else:
+        new_fav_value = True
+    execute_script = 'UPDATE Recipe ' \
+                     f'SET favorite = {new_fav_value} ' \
+                     f'WHERE recipe_id = {recipe_id}'
+    with db_connection:
+        db_connection.execute(execute_script)
+    if new_fav_value:
+        print('recipe favorited')
+    else:
+        print('recipe un-favorited')

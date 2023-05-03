@@ -7,13 +7,17 @@ from PIL import Image, ImageTk
 import tkinter as tk
 from tkinter import scrolledtext
 import  io
+from Functions import db_query_functions as dbFuncs
+import application as app
 from Pages import ScrollBox as sBox
 class Recipe(tk.Toplevel):
 
     def closePage(self,name):
         self.destroy()
 
-
+    def toggleFav(self,chk_box_state):
+        """add and remove favorite from recipe"""
+        dbFuncs.toggleFav(self.recipe_id,app.test_db_str)
 
     def __init__(self, recipe_info:dict, recipe_image_blob:bytes):
         super().__init__()
@@ -22,6 +26,10 @@ class Recipe(tk.Toplevel):
         self.recipe_ingreds = recipe_info['ingredients']
         self.recipe_instrs = recipe_info['instr'].split('. ')
         self.recipe_comment = recipe_info['comment']
+        if recipe_info['favorite']:
+            self.favorite = True
+        else:
+            self.favorite = False
         if not self.recipe_comment:
             self.recipe_comment = ''
         # convert image bytes to file-like object
@@ -46,8 +54,18 @@ class Recipe(tk.Toplevel):
         frame_note.grid(row=2, column=0,columnspan=3)
         # CHECKBOX
         favorite_toggle = tk.IntVar()
-        chk_box_fav = tk.Checkbutton(frame_navigation, text='fav', variable=favorite_toggle)
+        chk_box_fav = tk.Checkbutton(frame_navigation, text='fav', variable=favorite_toggle,command=lambda:self.toggleFav(self.recipe_id))
         chk_box_fav.grid(row=0, column=0)
+        # if recipe is favorite
+
+
+        # FAV CHECKBOX WONT SELECT
+        if self.favorite:
+            print('fav should be selected')
+            chk_box_fav.select()
+
+
+
         # BUTTON
         btn_close = tk.Button(frame_navigation,text='close',command=lambda:self.closePage(self.recipe_name))
         btn_close.grid(row=0,column=1)

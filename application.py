@@ -7,7 +7,8 @@ import pprint as pp
 
 
 log = logging.getLogger(__name__)
-test_db_str = './food_stuff_tester.db' # database connection path
+global test_db_str # database connection path
+test_db_str = './food_stuff_tester.db'
 home_pic_location = './food images/beef-gulasch-356793.jpg'
 search_pic_location = './food images/egg-shop-fried-chicken.jpg'
 

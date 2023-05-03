@@ -89,6 +89,7 @@ class Search(tk.Frame):
                                               navigation_dict['max_pages'])  # check if allowed to open a new window
                 if open_recipe_page:  # can show recipe
                     recipe_page = RecipePage.Recipe(selected_recipe[0], selected_recipe[1])
+
                     print('-' * 100)
 
 
