@@ -3,6 +3,9 @@ import tkinter as tk
 from tkinter import messagebox
 import pprint as pp
 from PIL import Image, ImageTk
+from Functions import db_query_functions as dbFuncs
+
+import application as app
 from Functions import db_query_functions
 from Pages import RecipePage, HelpPage
 
@@ -13,13 +16,14 @@ class Search(tk.Frame):
     user_last_filter = 'name'  # users last filter applied
 
     def __init__(self, parent, controller, navigation_dict):
-        # dict needs: homePage,helpPage,addPage,pic_location,db_str
+        # dict needs: homePage,helpPage,addPage,db_str
         tk.Frame.__init__(self, parent)
-        global search_photo
-        search_pic_location = navigation_dict['pic']
         test_db_str = navigation_dict['db_str']
-
-
+        # get a background image
+        print('Search BackGround ',end='')
+        bkrnd_image_info = dbFuncs.getImageRandom(test_db_str)[0]
+        self.bkrnd_image_name = bkrnd_image_info[0]
+        self.bkrnd_image = bkrnd_image_info[1]
         def checkBoxControl(box_var: tk.Checkbutton):  # search page
             """this function makes sure only one check box is selected at a time"""
             chk_boxes = [chk_bx_recipe, chk_bx_title, chk_bx_ingred, chk_bx_instrs]
@@ -60,10 +64,10 @@ class Search(tk.Frame):
                 Search.user_last_filter = checkBoxStatus()  # save last used filter
             entry_search_text.delete(0, tk.END)  # clear search box
 
-        def checkPages(name, recipe_pages: dict, max_pages_open):
+        def checkPages(name, recipe_pages: list, max_pages_open):
             can_open = True
             cant_open_str = f'cant open {name} - '
-            if name in recipe_pages.keys():  # if recipe page already open or
+            if name in recipe_pages:  # if recipe page already open or
                 can_open = False
                 cant_open_str += 'recipe already open/ '
             if len(recipe_pages) == max_pages_open:  # if max number of pages open
@@ -89,10 +93,8 @@ class Search(tk.Frame):
                                               navigation_dict['max_pages'])  # check if allowed to open a new window
                 if open_recipe_page:  # can show recipe
                     recipe_page = RecipePage.Recipe(selected_recipe[0], selected_recipe[1])
-
-                    print('-' * 100)
-
-
+                    app.open_recipes.append(recipe_page.recipe_name)
+                    print(f'opened {recipe_page.recipe_id}-{recipe_page.recipe_name} <-')
             except IndexError as e:  # if go button pressed while curser isnt on a recipe
                 pass
 
@@ -102,12 +104,12 @@ class Search(tk.Frame):
                                           navigation_dict['max_pages'])  # check if allowed to open a new window
             if open_recipe_page:  # can show recipe
                 recipe_page = RecipePage.Recipe(selected_item[0], selected_item[1])
-                print('-' * 100)
+                app.open_recipes.append(recipe_page.recipe_name)
+                print(f'opened {recipe_page.recipe_id}-{recipe_page.recipe_name} <-')
 
 
         def deleteRecipe():
             selected_item = l_box_search.curselection()
-            print(selected_item, '<-----------------')
             try:
                 recipe_db_id = rows[selected_item[0]][0]
                 recipe_name = rows[selected_item[0]][1].replace("_", " ")
@@ -118,16 +120,23 @@ class Search(tk.Frame):
                 confirmed = messagebox.askquestion(title=title_str,
                                                    message=f'DELETE\n{rows[selected_item[0]][1].replace("_", " ").title()}?')  # prompt user to confirm recipe deletion
                 if confirmed == 'yes':
-                    print(f'DELETING RECIPE_ID {recipe_db_id}')
                     db_query_functions.deleteRecipe(recipe_id=int(recipe_db_id),
                                                     db_connection_str=test_db_str)  # delete recipe from db
                     rows.pop(selected_item[0])  # delete recipe from stored recipe search
                     l_box_search.delete(selected_item[0])  # delete recipe from listbox
+                    print(f'deleted {recipe_db_id}-{recipe_name} -X')
             except IndexError as e:  # if delete button pressed while curser isnt on a recipe
                 print(e)
                 pass
 
         # --------------------------------------------------------------------------------------
+        # CANVAS
+
+        # BACKGROUND CANVAS
+        #canvas_bg = tk.Canvas(self)
+        #canvas_bg.pack(fill='both',expand=True)
+
+
         # FRAME
 
         frame_navigate = tk.LabelFrame(self, text='navigation')
@@ -178,10 +187,11 @@ class Search(tk.Frame):
         lbl_banned = tk.Label(frame_banned_ingreds,
                               text=f'{"*" * 10}\nbanned\ningrdients\ngo\nhere\n^\n|\n{"*" * 10}')
         lbl_banned.grid(row=1, column=1, columnspan=2)
-
-        image = Image.open(search_pic_location)
-        search_photo = ImageTk.PhotoImage(image)
-        lbl_pic = tk.Label(frame_search_pic, image=search_photo)
+        print('Search Page ', end='')
+        image_info = dbFuncs.getImageRandom(test_db_str)[0]
+        self.image_name = image_info[0]
+        self.image = image_info[1]
+        lbl_pic = tk.Label(frame_search_pic, image=self.image)
         lbl_pic.grid(row=0, column=1)
 
         lbl_btm_blank = tk.Label(frame_side_btns, text='')

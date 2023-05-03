@@ -2,16 +2,16 @@
 # todo - move nav buttons to top right like on other scrrens and have slideshow of random images below
 import tkinter as tk
 from PIL import Image, ImageTk
+
+import application
 from Pages import HelpPage
+from Functions import db_query_functions as dbFuncs
 class Home(tk.Frame):
     def __init__(self, parent, controller, navigation_pages:dict):
         self.PAGE_NAME = 'HOME'
         # parent is the root window
         # controller switches the pages
-        # navigation_pages are the pages user can go to from this page( format {'Home':frame_obj}
-        global home_photo
-        pic_location = navigation_pages['pic'] # save copy of image
-        del navigation_pages['pic'] # delete image from navigation buttons list
+        # navigation_pages are the pages user can go to from this page and other args needed( format {'Home':frame_obj}
         tk.Frame.__init__(self, parent)
 
         # FRAME
@@ -21,9 +21,11 @@ class Home(tk.Frame):
         frame_btn.grid(row=2, column=0, padx=0, pady=0)
 
         #  LABELS
-        image = Image.open(pic_location)
-        home_photo = ImageTk.PhotoImage(image)
-        lbl_pic = tk.Label(frame_pic, image=home_photo)
+        print('Home Page ',end='')
+        image_info = dbFuncs.getImageRandom(application.test_db_str)[0]
+        self.image_name = image_info[0]
+        self.image = image_info[1]
+        lbl_pic = tk.Label(frame_pic, image=self.image)
         lbl_pic.pack()
         lbl_title = tk.Label(self, text='welcome to cookbook app')
         lbl_title.grid(row=0, column=0)

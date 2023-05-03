@@ -13,6 +13,9 @@ from Pages import ScrollBox as sBox
 class Recipe(tk.Toplevel):
 
     def closePage(self,name):
+        app.open_recipes.remove(self.recipe_name)
+        print(f'closed {self.recipe_id}-{self.recipe_name} ->')
+
         self.destroy()
 
     def toggleFav(self,chk_box_state):
@@ -61,7 +64,7 @@ class Recipe(tk.Toplevel):
 
         # FAV CHECKBOX WONT SELECT
         if self.favorite:
-            print('fav should be selected')
+            #print('fav should be selected')
             chk_box_fav.select()
 
 

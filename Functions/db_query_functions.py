@@ -116,7 +116,7 @@ def getRowsAll(table_name: str, db_connection_str:str) -> list:
     return all_rows.fetchall()
 
 def getImageRandom(db_connection_str:str,num_of_images:int=1)->list:
-    """ return one or multiple random image and image name"""
+    """ return one or multiple random image names with images in jpeg format"""
     # get all image_ids
     execute_script = 'SELECT image_id from Image'
     db_connection = sqlite3.connect(db_connection_str)
@@ -145,6 +145,10 @@ def getImageRandom(db_connection_str:str,num_of_images:int=1)->list:
         pic = Image.open(io.BytesIO(image_pair[1]))
         sub_list.append(ImageTk.PhotoImage(pic))
         random_jpeg_images.append(tuple(sub_list))
+    print('Images: ',end='')
+    for j in random_jpeg_images:
+        print(j[0],end='/ ')
+    print()
     return random_jpeg_images
     # todo - check if this runs correctly
 
@@ -178,7 +182,6 @@ def deleteRecipe(recipe_id:int,db_connection_str:str):
         execute_script = f'DELETE FROM {str(table)} WHERE recipe_id={recipe_id}'
         with db_connection_str:
             db_connection_str.execute(execute_script)
-    print('Recipe Deleted')
 def addComment(recipe_id:int,db_connection,comment:str)->None:
     # todo- should auto update the updated_at column
     execute_script = 'UPDATE Recipe ' \

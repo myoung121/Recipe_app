@@ -9,16 +9,14 @@ import pprint as pp
 log = logging.getLogger(__name__)
 global test_db_str # database connection path
 test_db_str = './food_stuff_tester.db'
-home_pic_location = './food images/beef-gulasch-356793.jpg'
-search_pic_location = './food images/egg-shop-fried-chicken.jpg'
 
 # track how many windows open
-MAX_OPEN_RECIPES = 3
+MAX_OPEN_RECIPES = 5
 # this tracks open recipe windows by name as key and image as value(images had to be avail in this file)
-open_recipes = {}
+open_recipes = []
 
-# help page canvas images
-help_canvas = {}
+# tracks if help page is open
+help_open = False
 class MyApp:
 
     @staticmethod
@@ -55,10 +53,10 @@ class MyApp:
 
                 container.grid_rowconfigure(0, weight=1)
                 container.grid_columnconfigure(0, weight=1)
-                home_nav = {'search':SearchPage.Search,'add':AddPage.Add,'help':Help,'pic':home_pic_location}
+                home_nav = {'search':SearchPage.Search,'add':AddPage.Add,'help':Help}
                 search_nav = {'help':Help,'add':AddPage.Add,'home':HomePage.Home,
-                              'pic':search_pic_location,'db_str':test_db_str,
-                              'open_pages':open_recipes,'max_pages':MAX_OPEN_RECIPES}
+                              'db_str':test_db_str,'open_pages':open_recipes,
+                              'max_pages':MAX_OPEN_RECIPES}
                 add_nav = {'help':Help,'home':HomePage.Home,}
                 self.frames = self.makeFrames((HomePage.Home, SearchPage.Search, AddPage.Add),
                                               (home_nav,search_nav,add_nav),parent=container)
