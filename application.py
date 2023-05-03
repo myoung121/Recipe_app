@@ -56,7 +56,7 @@ class MyApp:
                 search_nav = {'help':Help,'add':AddPage.Add,'home':HomePage.Home,
                               'db_str':test_db_str,'open_pages':open_recipes,
                               'max_pages':MAX_OPEN_RECIPES}
-                add_nav = {'help':Help,'home':HomePage.Home,}
+                add_nav = {'help':Help,'home':HomePage.Home,'search':SearchPage.Search}
                 self.frames = self.makeFrames((HomePage.Home, SearchPage.Search, AddPage.Add),
                                               (home_nav,search_nav,add_nav),parent=container)
 

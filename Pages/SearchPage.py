@@ -58,7 +58,11 @@ class Search(tk.Frame):
                                                           user_filter=checkBoxStatus())  # return filtered recipes
             # Add items to the search listbox
             for item in rows:
-                l_box_search.insert(tk.END, item[:2])
+                item = list(item)
+                print(item)
+                item[1]=item[1].replace('_',' ')
+                print(item[1])
+                l_box_search.insert(tk.END, f'{item[0]}. {item[1].title()}')
             if entry_search_text.get():
                 Search.user_last_search_str = entry_search_text.get()  # save last searched word
                 Search.user_last_filter = checkBoxStatus()  # save last used filter
@@ -187,13 +191,13 @@ class Search(tk.Frame):
 
         # LABEL
         lbl_banned = tk.Label(frame_banned_ingreds,
-                              text=f'{"*" * 10}\nbanned\ningrdients\ngo\nhere\n^\n|\n{"*" * 10}')
+                              text=f'{"*" * 10}\nbanned\ningrdients\ngo\nhere\n^\n|\n{"*" * 10}',padx=5)
         lbl_banned.grid(row=1, column=1, columnspan=2)
         print('Search Page ', end='')
         image_info = dbFuncs.getImageRandom(test_db_str)[0]
         self.image_name = image_info[0]
         self.image = image_info[1]
-        lbl_pic = tk.Label(frame_search_pic, image=self.image)
+        lbl_pic = tk.Label(frame_search_pic, image=self.image,padx=5)
         lbl_pic.grid(row=0, column=1)
 
         lbl_btm_blank = tk.Label(frame_side_btns, text='')
