@@ -21,6 +21,8 @@ class Help(tk.Toplevel):
         # nav dict needs:
         super().__init__()
         self.title('Help / Info')
+        # set size
+        self.geometry('400x300')
         db_str = app.test_db_str
         # make parent widget for tabs
         tab_parent = ttk.Notebook(self)
@@ -50,7 +52,6 @@ class Help(tk.Toplevel):
                                                  numbered=False,with_canvas=True,db_connection_str=db_str)
                     }
 
-        print('')
         # export canvas images to main app
         #for tab_name,box in all_tabs.items():
         #    app.help_canvas[tab_name] = box.getImage()

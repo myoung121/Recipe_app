@@ -133,28 +133,30 @@ class Search(tk.Frame):
         # CANVAS
 
         # BACKGROUND CANVAS
-        #canvas_bg = tk.Canvas(self)
-        #canvas_bg.pack(fill='both',expand=True)
-
+        """canvas_bg = tk.Canvas(self)
+        canvas_bg.pack(fill='both',expand=True)
+        # set image in canvas
+        canvas_bg.create_image(0,0,image=self.bkrnd_image)
+        """
 
         # FRAME
 
-        frame_navigate = tk.LabelFrame(self, text='navigation')
+        frame_navigate = tk.Frame(self)
         frame_navigate.grid(row=0, column=2)
 
-        frame_banned_ingreds = tk.LabelFrame(self, text='banned ingreds')
+        frame_banned_ingreds = tk.Frame(self)
         frame_banned_ingreds.grid(row=1, column=0)
 
-        frame_search_pic = tk.LabelFrame(self, text='search/pic')
-        frame_search_pic.grid(row=1, column=1, columnspan=2)
+        frame_search_pic = tk.Frame(self)
+        frame_search_pic.grid(row=1, column=1, columnspan=2,)
 
-        frame_toggles = tk.LabelFrame(self, text='toggles')
+        frame_toggles = tk.Frame(self)
         frame_toggles.grid(row=2, column=1)
 
-        frame_entry_w_btn = tk.LabelFrame(self, text='search box/btn')
+        frame_entry_w_btn = tk.Frame(self)
         frame_entry_w_btn.grid(row=3, column=1)  # ,columnspan=2)
 
-        frame_side_btns = tk.LabelFrame(self, text='side btns')
+        frame_side_btns = tk.Frame(self)
         frame_side_btns.grid(row=2, column=2)
 
         # BUTTONS
@@ -198,7 +200,7 @@ class Search(tk.Frame):
         lbl_btm_blank.grid(row=0, column=1, padx=15)
 
         # LISTBOX
-        l_box_search = tk.Listbox(frame_search_pic)
+        l_box_search = tk.Listbox(frame_search_pic,width=50)
         l_box_search.grid(row=0, column=0)
         # Bind selection function to the listbox
         l_box_search.bind('<Double-1>', recipeSelect)
@@ -231,4 +233,4 @@ class Search(tk.Frame):
                                        variable=instrs_toggle, command=lambda: checkBoxControl(chk_bx_instrs))
         chk_bx_instrs.grid(row=0, column=3, padx=5)
 
-        #search()  # loads all recipes into  search box
+        search()  # loads all recipes into  search box

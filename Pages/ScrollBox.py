@@ -39,10 +39,10 @@ class ScrollTextBox(tk.Frame):
             canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
             # get random image name and image
+            print('Help Tab ', end='')
             random_image_info = dbFuncs.getImageRandom(db_connection_str)[0]
             self.image_name = random_image_info[0]
             self.image = random_image_info[1]
-            pprint.pprint(self.image)
             # create a PhotoImage object from the image file
             #self.img = Image.open(io.BytesIO(self.image_bytes))
             #self.img = ImageTk.PhotoImage(self.img)

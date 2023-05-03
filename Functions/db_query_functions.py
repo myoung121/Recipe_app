@@ -115,7 +115,7 @@ def getRowsAll(table_name: str, db_connection_str:str) -> list:
         all_rows = db_connection_str.execute(execute_script)
     return all_rows.fetchall()
 
-def getImageRandom(db_connection_str:str,num_of_images:int=1)->list:
+def getImageRandom(db_connection_str:str,num_of_images:int=1,screen_sized=False,screen_w_h:tuple=(600,500))->list:
     """ return one or multiple random image names with images in jpeg format"""
     # get all image_ids
     execute_script = 'SELECT image_id from Image'

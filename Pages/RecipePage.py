@@ -38,16 +38,16 @@ class Recipe(tk.Toplevel):
         # convert image bytes to file-like object
         pic = Image.open(io.BytesIO(recipe_image_blob))  # convert image bytes to PIL image format(jpeg)
         self.recipe_pic = ImageTk.PhotoImage(pic)
-        length = '900'
-        width = '700'
-        self.geometry(f'{length}x{width}')
+        width = '800'
+        height = '700'
+        self.geometry(f'{width}x{height}')
         self.title(f'#{self.recipe_id} {self.recipe_name.upper()}')
         # FRAME
         frame_navigation = tk.LabelFrame(self, text='navigation', padx=0, pady=0)
         frame_navigation.grid(row=0, column=1)
         frame_image_note = tk.LabelFrame(self,text='image/note')
         frame_image_note.grid(row=1, column=1,rowspan=3)
-        frame_ingreds_instrs = tk.LabelFrame(self, text='Ingreds/Instrs',height=int(width)-100,width=int(int(length)/2))
+        frame_ingreds_instrs = tk.LabelFrame(self, text='Ingreds/Instrs',height=int(height)-100,width=int(int(width)/2))
         frame_ingreds_instrs.grid(row=1, rowspan=2,column=0)
         frame_ingreds = tk.LabelFrame(frame_ingreds_instrs,text='ingreds')
         frame_ingreds.grid(row=0,column=0,sticky='n',pady=20)

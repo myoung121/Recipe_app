@@ -3,7 +3,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 
-import application
+import application as app
 from Pages import HelpPage
 from Functions import db_query_functions as dbFuncs
 class Home(tk.Frame):
@@ -13,6 +13,19 @@ class Home(tk.Frame):
         # controller switches the pages
         # navigation_pages are the pages user can go to from this page and other args needed( format {'Home':frame_obj}
         tk.Frame.__init__(self, parent)
+        # get a background image
+        print('Home BackGround ', end='')
+        bkrnd_image_info = dbFuncs.getImageRandom(app.test_db_str,screen_sized=True,screen_w_h=(app.WINDOW_WIDTH,app.WINDOW_HEIGHT))[0]
+        self.bkrnd_image_name = bkrnd_image_info[0]
+        self.bkrnd_image = bkrnd_image_info[1]
+#-------------------------------------------------------
+        # CANVAS
+
+        # BACKGROUND CANVAS
+        #canvas_bg = tk.Canvas(self,width=app.WINDOW_WIDTH,height=app.WINDOW_HEIGHT)
+        #canvas_bg.pack(fill='both',expand=True)
+        # set image in canvas
+        #canvas_bg.create_image(0,0,image=self.bkrnd_image,anchor='nw')
 
         # FRAME
         frame_pic = tk.Frame(self)
@@ -22,7 +35,7 @@ class Home(tk.Frame):
 
         #  LABELS
         print('Home Page ',end='')
-        image_info = dbFuncs.getImageRandom(application.test_db_str)[0]
+        image_info = dbFuncs.getImageRandom(app.test_db_str)[0]
         self.image_name = image_info[0]
         self.image = image_info[1]
         lbl_pic = tk.Label(frame_pic, image=self.image)

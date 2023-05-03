@@ -9,14 +9,13 @@ import pprint as pp
 log = logging.getLogger(__name__)
 global test_db_str # database connection path
 test_db_str = './food_stuff_tester.db'
-
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 300
 # track how many windows open
 MAX_OPEN_RECIPES = 5
 # this tracks open recipe windows by name as key and image as value(images had to be avail in this file)
 open_recipes = []
-
-# tracks if help page is open
-help_open = False
+help_open = False # tracks if help page is open
 class MyApp:
 
     @staticmethod
@@ -46,7 +45,7 @@ class MyApp:
                 global frames
                 # __init__ function for class Tk
                 tk.Tk.__init__(self, *args, **kwargs)
-                self.geometry('800x500')
+                self.geometry(F'{str(WINDOW_WIDTH)}x{str(WINDOW_HEIGHT)}')
                 # creating a container
                 container = tk.Frame(self)
                 container.pack(side="top", fill="both", expand=True)
