@@ -11,6 +11,7 @@ global test_db_str # database connection path
 test_db_str = './food_stuff_tester.db'
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 300
+BG_COLOR = '#0b0854'
 # track how many windows open
 MAX_OPEN_RECIPES = 5
 # this tracks open recipe windows by name as key and image as value(images had to be avail in this file)

@@ -7,10 +7,18 @@ from PIL import Image, ImageTk
 import tkinter as tk
 from tkinter import scrolledtext
 import  io
+import random as ran
 from Functions import db_query_functions as dbFuncs
 import application as app
 from Pages import ScrollBox as sBox
 class Recipe(tk.Toplevel):
+    __bg_colors__ = tuple('#b2d3c2 #ebe1a1 #2c7564 #9e7b6f #524d5c #8f9ba6 '
+                          '#945d00 #ffb6c1 #ffeead #4b0082'.split(' '))
+    __bg_colors2__ = tuple('#FFA07A #FFD700 #FF69B4 #9400D3 #FF8C00 '
+                           '#00FFFF #FF1493 #BA55D3 #32CD32 #FF4500'.split(' '))
+
+
+
 
     def closePage(self,name):
         app.open_recipes.remove(self.recipe_name)
@@ -24,6 +32,8 @@ class Recipe(tk.Toplevel):
 
     def __init__(self, recipe_info:dict, recipe_image_blob:bytes):
         super().__init__()
+        #color_set = ran.choice((self.__bg_colors__,self.__bg_colors2__))
+        self.color = ran.choice(self.__bg_colors__)
         self.recipe_id = recipe_info['recipe_id']
         self.recipe_name = recipe_info['name']
         self.recipe_ingreds = recipe_info['ingredients']
@@ -42,18 +52,19 @@ class Recipe(tk.Toplevel):
         height = '700'
         self.geometry(f'{width}x{height}')
         self.title(f'#{self.recipe_id} {self.recipe_name.upper()}')
+        self.config(bg=self.color)
         # FRAME
-        frame_navigation = tk.LabelFrame(self, text='navigation', padx=0, pady=0)
+        frame_navigation = tk.LabelFrame(self, text='navigation', padx=0, pady=0,bg=self.color)
         frame_navigation.grid(row=0, column=1)
-        frame_image_note = tk.LabelFrame(self,text='image/note')
+        frame_image_note = tk.LabelFrame(self,text='image/note',bg=self.color)
         frame_image_note.grid(row=1, column=1,rowspan=3)
-        frame_ingreds_instrs = tk.LabelFrame(self, text='Ingreds/Instrs',height=int(height)-100,width=int(int(width)/2))
+        frame_ingreds_instrs = tk.LabelFrame(self, bg=self.color,text='Ingreds/Instrs',height=int(height)-100,width=int(int(width)/2))
         frame_ingreds_instrs.grid(row=1, rowspan=2,column=0)
-        frame_ingreds = tk.LabelFrame(frame_ingreds_instrs,text='ingreds')
+        frame_ingreds = tk.LabelFrame(frame_ingreds_instrs,bg=self.color,text='ingreds')
         frame_ingreds.grid(row=0,column=0,sticky='n',pady=20)
-        frame_instrs = tk.LabelFrame(frame_ingreds_instrs,text='instrs')
+        frame_instrs = tk.LabelFrame(frame_ingreds_instrs,bg=self.color,text='instrs')
         frame_instrs.grid(row=1,column=0,sticky='s',pady=25)
-        frame_note = tk.LabelFrame(frame_image_note, text='notes')
+        frame_note = tk.LabelFrame(frame_image_note, bg=self.color,text='notes')
         frame_note.grid(row=2, column=0,columnspan=3)
         # CHECKBOX
         favorite_toggle = tk.IntVar()

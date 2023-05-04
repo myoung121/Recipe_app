@@ -4,12 +4,14 @@ import tkinter as tk
 import pprint as pp
 from tkinter import scrolledtext
 from Pages import HelpPage
+import  application as app
 
 class Add(
     tk.Frame):
 
     def __init__(self, parent, controller, navigation_dict):
         tk.Frame.__init__(self, parent)
+        self.config(bg=app.BG_COLOR)
         # FUNCTIONS
 
         def addIngred(event):
@@ -71,21 +73,21 @@ class Add(
 
         # FRAMES
 
-        frame_entries = tk.Frame(self, padx=0, pady=0)
+        frame_entries = tk.Frame(self, padx=0, pady=0,bg=app.BG_COLOR)
         frame_entries.grid(row=1, column=0,columnspan=2)
-        frame_entries_left = tk.Frame(frame_entries,padx=5)
+        frame_entries_left = tk.Frame(frame_entries,padx=5,bg=app.BG_COLOR)
         frame_entries_left.grid(row=0,column=0)
-        frame_entries_right = tk.Frame(frame_entries,padx=5,pady=5)
+        frame_entries_right = tk.Frame(frame_entries,padx=5,pady=5,bg=app.BG_COLOR)
         frame_entries_right.grid(row=0,column=1)
 
-        frame_navigation = tk.Frame(self, padx=0, pady=0)
+        frame_navigation = tk.Frame(self, padx=0, pady=0,bg=app.BG_COLOR)
         frame_navigation.grid(row=0, column=6)
 
-        frame_ingred_display = tk.Frame(self, padx=0, pady=0)
+        frame_ingred_display = tk.Frame(self, padx=0, pady=0,bg=app.BG_COLOR)
         frame_ingred_display.grid(row=1, column=3,columnspan=4)
-        frame_ingred_display_left = tk.Frame(frame_ingred_display)
+        frame_ingred_display_left = tk.Frame(frame_ingred_display,bg=app.BG_COLOR)
         frame_ingred_display_left.grid(row=0,column=0,columnspan=2)
-        frame_ingred_display_right = tk.Frame(frame_ingred_display,padx=5,pady=5)
+        frame_ingred_display_right = tk.Frame(frame_ingred_display,padx=5,pady=5,bg=app.BG_COLOR)
         frame_ingred_display_right.grid(row=0,column=2,columnspan=2)
         # frame_add_minus_ingred = tk.LabelFrame(frame_ingred_display, text='+-btns', padx=4, pady=5)
         # frame_add_minus_ingred.grid(row=1, column=1,rowspan=4)

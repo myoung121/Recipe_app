@@ -18,6 +18,7 @@ class Search(tk.Frame):
     def __init__(self, parent, controller, navigation_dict):
         # dict needs: homePage,helpPage,addPage,db_str
         tk.Frame.__init__(self, parent)
+        self.config(bg=app.BG_COLOR)
         test_db_str = navigation_dict['db_str']
         # get a background image
         def checkBoxControl(box_var: tk.Checkbutton):  # search page
@@ -72,7 +73,7 @@ class Search(tk.Frame):
                 can_open = False
                 cant_open_str += 'max number of recipes opened/ close a window to see recipe'
             if not can_open:
-                print(cant_open_str)
+                print(cant_open_str + ' -F')
             return can_open
 
         def recipeSelect(event):  # search page
@@ -139,22 +140,22 @@ class Search(tk.Frame):
 
         # FRAME
 
-        frame_navigate = tk.Frame(self)
+        frame_navigate = tk.Frame(self,bg=app.BG_COLOR)
         frame_navigate.grid(row=0, column=2)
 
-        frame_banned_ingreds = tk.Frame(self)
+        frame_banned_ingreds = tk.Frame(self,bg=app.BG_COLOR)
         frame_banned_ingreds.grid(row=1, column=0)
 
-        frame_search_pic = tk.Frame(self)
+        frame_search_pic = tk.Frame(self,bg=app.BG_COLOR)
         frame_search_pic.grid(row=1, column=1, columnspan=2,)
 
-        frame_toggles = tk.Frame(self)
+        frame_toggles = tk.Frame(self,bg=app.BG_COLOR)
         frame_toggles.grid(row=2, column=1)
 
-        frame_entry_w_btn = tk.Frame(self)
+        frame_entry_w_btn = tk.Frame(self,bg=app.BG_COLOR)
         frame_entry_w_btn.grid(row=3, column=1)  # ,columnspan=2)
 
-        frame_side_btns = tk.Frame(self)
+        frame_side_btns = tk.Frame(self,bg=app.BG_COLOR)
         frame_side_btns.grid(row=2, column=2)
 
         # BUTTONS

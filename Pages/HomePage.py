@@ -16,37 +16,23 @@ class Home(tk.Frame):
         self.images = {}
         self.image_frames={}
         self.image_labels = {}
+        self.config(bg=app.BG_COLOR)
         NUM_IMAGES = 3
 #-------------------------------------------------------
-        # CANVAS
-
-        # BACKGROUND CANVAS
-        #canvas_bg = tk.Canvas(self,width=app.WINDOW_WIDTH,height=app.WINDOW_HEIGHT)
-        #canvas_bg.pack(fill='both',expand=True)
-        # set image in canvas
-        #canvas_bg.create_image(0,0,image=self.bkrnd_image,anchor='nw')
-
         # WILL HAVE 3 PICS
         # FRAME
-        frame_images = tk.LabelFrame(self,text='images main',padx=2)
+        frame_images = tk.LabelFrame(self,text='images main',padx=2,bg=app.BG_COLOR)
         frame_images.grid(row=1,column=0,columnspan=3)
         frame_navigation = tk.Frame(self)
         frame_navigation.grid(row=0, column=2)
-        """        frame_img1 = tk.LabelFrame(frame_images,text='pic1')
-        frame_img1.grid(row=0,column=0)
-        frame_img2= tk.LabelFrame(frame_images,text='pic2')
-        frame_img2.grid(row=0,column=1)
-        frame_img3= tk.LabelFrame(frame_images,text='pic3')
-        frame_img3.grid(row=0,column=2)
-"""
 
 
         #  LABELS
-        lbl_title = tk.Label(self, text='cookbook app'.upper())
+        lbl_title = tk.Label(self, text='cookbook app'.upper(),bg=app.BG_COLOR,fg='white')
         lbl_title.grid(row=0, column=1)
     # make frames for number of images
         for b in range(NUM_IMAGES):
-            self.image_frames[f'frame{str(b)}'] = tk.LabelFrame(frame_images,text=f'pic{b}')
+            self.image_frames[f'frame{str(b)}'] = tk.LabelFrame(frame_images,text=f'pic{b}',bg=app.BG_COLOR)
             self.image_frames[f'frame{str(b)}'].grid(row=1,column=b)
         # IMAGE LABELS
         # get random images
