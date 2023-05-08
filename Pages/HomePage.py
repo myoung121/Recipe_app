@@ -1,86 +1,68 @@
 """HOME PAGE"""
-# todo - move nav buttons to top right like on other scrrens and have slideshow of random images below
+from Widgets import NavBar
 import tkinter as tk
-from PIL import Image, ImageTk
-
-import application as app
-from Pages import HelpPage
 from Functions import db_query_functions as dbFuncs
+
 class Home(tk.Frame):
-    def __init__(self, parent, controller, navigation_pages:dict):
+    def __init__(self, parent, controller, page_info:dict):
         self.PAGE_NAME = 'HOME'
         # parent is the root window
         # controller switches the pages
-        # navigation_pages are the pages user can go to from this page and other args needed( format {'Home':frame_obj}
+        # page_info  is the information and data needed build the page ex: colors, db location, other pages
         tk.Frame.__init__(self, parent)
-        self.images = {}
-        self.image_frames={}
-        self.image_labels = {}
-        self.config(bg=app.BG_COLOR)
-        NUM_IMAGES = 3
+        self.images = {} # store images
+        self.image_frames={} # store image frames
+        self.image_labels = {} # store image labels
+        self.BG_COLOR = page_info['bg_color'] # page background color
+        db_conn_str = page_info['db_str'] # database location / connection
+        self.config(bg=self.BG_COLOR) # set page background to the background color
+        self.width = int(page_info['win_size'].split('x')[0]) # get window width
+        NUM_IMAGES = 3 # number of images to show on this page
 #-------------------------------------------------------
         # WILL HAVE 3 PICS
         # FRAME
-        frame_images = tk.LabelFrame(self,text='images main',padx=2,bg=app.BG_COLOR)
+        frame_images = tk.Frame(self,padx=2,bg=self.BG_COLOR,width=self.width) # used as the main frame that holds the images in frames
         frame_images.grid(row=1,column=0,columnspan=3)
-        frame_navigation = tk.Frame(self)
-        frame_navigation.grid(row=0, column=2)
-
+        # navigation frame / bar
+        NavBar.NavBar(self,controller,2,self.BG_COLOR,('help','search','add','quit'))
 
         #  LABELS
-        lbl_title = tk.Label(self, text='cookbook app'.upper(),bg=app.BG_COLOR,fg='white')
+        lbl_title = tk.Label(self, text='cookbook app'.upper(),bg=self.BG_COLOR,fg='white') # welcome message
         lbl_title.grid(row=0, column=1)
-    # make frames for number of images
-        for b in range(NUM_IMAGES):
-            self.image_frames[f'frame{str(b)}'] = tk.LabelFrame(frame_images,text=f'pic{b}',bg=app.BG_COLOR)
-            self.image_frames[f'frame{str(b)}'].grid(row=1,column=b)
-        # IMAGE LABELS
+
+
+        print('Home Page ', end='') # pretext to identify what random pic names are printed to term.
+
         # get random images
-        print('Home Page ',end='')
-        all_images_info = dbFuncs.getImageRandom(app.test_db_str,num_of_images=NUM_IMAGES)
+        all_images_info = dbFuncs.getImageRandom(db_conn_str,num_of_images=NUM_IMAGES)
+
         # attach images to page for all frames
         for num,i in enumerate(all_images_info):
-            self.images[f'image{str(num)}'] = i[1]
-        for numm,a in enumerate(self.images):
-            self.image_labels[f'label{numm}'] =tk.Label(self.image_frames[f'frame{str(numm)}'],
-                                                        image=self.images[f'image{str(numm)}'],padx=5)
-            self.image_labels[f'label{numm}'].grid(row=0,column=0)
+            image_frame_text = all_images_info[num][0].replace("_"," ")
+            if len(image_frame_text) > 30: # only show 30 chars
+                image_frame_text = image_frame_text[:27] + '...' # change last 3 letter to show name is longer
+            self.image_frames[f'frame{str(num)}'] = tk.LabelFrame(frame_images, text=f'{image_frame_text}',
+                                                                  bg=self.BG_COLOR,fg='white',border=False,labelanchor='s') # make a frame for each image
+            self.image_frames[f'frame{str(num)}'].grid(row=1, column=num)  # add image frames to main frame
 
+            self.images[f'image{str(num)}'] = i[1] # add image to image dict
+            self.image_labels[f'label{num}'] = tk.Label(self.image_frames[f'frame{str(num)}'],
+                                                     image=self.images[f'image{str(num)}'], padx=5) # add images to a label
+            self.image_labels[f'label{num}'].grid(row=0, column=0) # add the labels with images to the frame
 
+        """       
         # BUTTONS
-        # navigation buttons
-        btn_search = tk.Button(frame_navigation, text='search',
-                               command=lambda: controller.show_frame(navigation_pages['search']))
+
+        # SEARCH
+        btn_search = tk.Button(frame_navigation, text='search',bg=self.BG_COLOR, fg='white',border=False,
+                               command=lambda: controller.show_frame(page_info['search'])) # goto recipe search page
         btn_search.grid(row=0, column=1, padx=0)
-        btn_add = tk.Button(frame_navigation, text='add', command=lambda: controller.show_frame(navigation_pages['add']))
+        # ADD
+        btn_add = tk.Button(frame_navigation, text='add', bg=self.BG_COLOR, fg='white',border=False,command=lambda: controller.show_frame(page_info['add'])) # goto add recipe page
         btn_add.grid(row=0, column=2, padx=0)
-        btn_help = tk.Button(frame_navigation, text='help', command=lambda: HelpPage.Help())
+        # HELP
+        btn_help = tk.Button(frame_navigation, text='help',bg=self.BG_COLOR, fg='white',border=False,command=lambda: page_info['help']()) # open help / info pop-up
         btn_help.grid(row=0, column=0, padx=0)
-        btn_quit = tk.Button(frame_navigation, text='quit', command=lambda: exit('QUIT'))
-        btn_quit.grid(row=0, column=3, padx=0)
-        """# FRAME
-        frame_pic = tk.Frame(self)
-        frame_pic.grid(row=1, column=0)
-        frame_btn = tk.Frame(self)
-        frame_btn.grid(row=2, column=0, padx=0, pady=0)
-
-        #  LABELS
-        print('Home Page ',end='')
-        image_info = dbFuncs.getImageRandom(app.test_db_str)[0]
-        self.image_name = image_info[0]
-        self.image = image_info[1]
-        lbl_pic = tk.Label(frame_pic, image=self.image)
-        lbl_pic.pack()
-        lbl_title = tk.Label(self, text='welcome to cookbook app')
-        lbl_title.grid(row=0, column=0)
-
-        # BUTTONS
-        # navigation buttons
-        btn_search = tk.Button(frame_btn, text='search', command=lambda: controller.show_frame(navigation_pages['search']))
-        btn_search.grid(row=1, column=0, padx=5)
-        btn_add = tk.Button(frame_btn, text='add', command=lambda: controller.show_frame(navigation_pages['add']))
-        btn_add.grid(row=1, column=1, padx=5)
-        btn_help = tk.Button(frame_btn, text='help', command=lambda: HelpPage.Help())
-        btn_help.grid(row=1, column=2, padx=5)
-        btn_quit = tk.Button(frame_btn, text='quit',command=lambda:exit('QUIT'))
-        btn_quit.grid(row=1, column=3, padx=5)"""
+        # QUIT
+        btn_quit = tk.Button(frame_navigation, text='quit', bg=self.BG_COLOR, fg='red',border=False,command=lambda: exit('QUIT')) # quit / close app
+        btn_quit.grid(row=0, column=3, padx=0)"""

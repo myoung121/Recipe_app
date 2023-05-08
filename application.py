@@ -2,15 +2,17 @@ import logging
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
 from PIL import Image, ImageTk
-from Pages import HomePage,SearchPage, AddPage
+from Pages import HomePage,SearchPage, AddPage, HelpPage
 import pprint as pp
 
 
 log = logging.getLogger(__name__)
 global test_db_str # database connection path
 test_db_str = './food_stuff_tester.db'
-WINDOW_WIDTH = 800
+DB_STR = './food_stuff_tester.db'
+WINDOW_WIDTH = 830
 WINDOW_HEIGHT = 300
+WINDOW_SIZE = f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}'
 BG_COLOR = '#0b0854'
 # track how many windows open
 MAX_OPEN_RECIPES = 5
@@ -46,18 +48,20 @@ class MyApp:
                 global frames
                 # __init__ function for class Tk
                 tk.Tk.__init__(self, *args, **kwargs)
-                self.geometry(F'{str(WINDOW_WIDTH)}x{str(WINDOW_HEIGHT)}')
+                self.geometry(WINDOW_SIZE) # set window size
+                self.resizable(width=True,height=False) # lock window size
                 # creating a container
                 container = tk.Frame(self)
                 container.pack(side="top", fill="both", expand=True)
 
                 container.grid_rowconfigure(0, weight=1)
                 container.grid_columnconfigure(0, weight=1)
-                home_nav = {'search':SearchPage.Search,'add':AddPage.Add,'help':Help}
-                search_nav = {'help':Help,'add':AddPage.Add,'home':HomePage.Home,
+                home_nav = {'search':SearchPage.Search,'add':AddPage.Add,'help':HelpPage.Help,
+                            'bg_color':BG_COLOR,'db_str':DB_STR,'win_size':WINDOW_SIZE}
+                search_nav = {'help':HelpPage.Help,'add':AddPage.Add,'home':HomePage.Home,
                               'db_str':test_db_str,'open_pages':open_recipes,
                               'max_pages':MAX_OPEN_RECIPES}
-                add_nav = {'help':Help,'home':HomePage.Home,'search':SearchPage.Search}
+                add_nav = {'help':HelpPage.Help,'home':HomePage.Home,'search':SearchPage.Search}
                 self.frames = self.makeFrames((HomePage.Home, SearchPage.Search, AddPage.Add),
                                               (home_nav,search_nav,add_nav),parent=container)
 
@@ -73,8 +77,7 @@ class MyApp:
 
         # --------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        class Help(tk.Frame):
-            pass
+
 
         # Driver Code
         app = tkinterApp()
