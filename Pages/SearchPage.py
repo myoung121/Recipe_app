@@ -46,13 +46,13 @@ class Search(tk.Frame):
             if not entry_search_text.get():  # empty entry
                 pass
                 checkBoxControl(chk_bx_title)  # set default search field to recipe name
-                rows = db_query_functions.getRowsFiltered(search_txt='', db_connection_str=test_db_str,
-                                                          user_filter=checkBoxStatus(),
-                                                          return_all=True)  # return all recipes
+                rows = db_query_functions.getFilteredRecipes(search_txt='', db_connection_str=test_db_str,
+                                                             user_filter=checkBoxStatus(),
+                                                             return_all=True)  # return all recipes
             else:
-                rows = db_query_functions.getRowsFiltered(search_txt=entry_search_text.get(),
-                                                          db_connection_str=test_db_str,
-                                                          user_filter=checkBoxStatus())  # return filtered recipes
+                rows = db_query_functions.getFilteredRecipes(search_txt=entry_search_text.get(),
+                                                             db_connection_str=test_db_str,
+                                                             user_filter=checkBoxStatus())  # return filtered recipes
             # Add items to the search listbox
             for item in rows:
                 item = list(item)

@@ -2,7 +2,7 @@ import random as ran
 import sqlite3
 from PIL import Image, ImageTk
 import  io
-""" FUNCTIONS THAT RETURN A SINGLE FORMATTED RECIPE"""
+""" FUNCTIONS THAT RETURN A SINGLE FORMATTED RECIPE RECORD / INFO"""
 
 
 def getRecipeInfo(recipe_id: int, db_connection_str:str) -> (dict, bytes):  # show recipe button
@@ -62,10 +62,10 @@ def getRecipeInfoRandom(db_connection_str:str) -> (dict, bytes):  # random recip
 
 
 # -------------------------------------------------------------------------------
-"""FUNCTIONS THAT RETURN RECIPE INFO"""
+"""FUNCTIONS THAT RETURN RECIPE RECORD INFO"""
 
 
-def getRowsFiltered(search_txt, db_connection_str:str, user_filter: str= 'name',return_all:bool=False):  # search box / toggle buttons
+def getFilteredRecipes(search_txt, db_connection_str:str, user_filter: str= 'name', return_all:bool=False):  # search box / toggle buttons
     """can search by name, recipe_id, ingredient, instruction"""
     column_names = ('Recipe.recipe_id', 'recipe_name', 'prep_time', 'cook_time')
     allowed_filters = ('name', 'recipe_id', 'ingredient', 'instruction')
@@ -153,7 +153,7 @@ def getImageRandom(db_connection_str:str,num_of_images:int=1,screen_sized=False,
     # todo - check if this runs correctly
 
 # --------------------------------------------------------------
-"""FUNCTIONS THAT ALTER DB INFO"""
+"""FUNCTIONS THAT ALTER TABLE"""
 
 
 def addRecipe(recipe_name:str,db_connection, instructions:str,
@@ -164,7 +164,10 @@ def addRecipe(recipe_name:str,db_connection, instructions:str,
         pass
     # todo - should auto update the created_at and updated_at columns
     # todo - include addIngredients()
-    recipe_id = len(getRowsAll('Recipe',db_connection)) # this wont work when start deleting rows, should use the max recipe_id number + 1instead
+    # todo - make func to check if ingreds are unique and add them to ingred table
+    # todo - make func to add ingred to recipe_ingred table
+    recipe_id = getMaxRecipeId(db_connection) + 1 # set the recipe_id to the largest recipe_id in table + 1
+    exit(f'new recipe_id is {recipe_id}')
     table_columns_str = 'Recipe(recipe_id, recipe_name, instr, cook_time, comment) VALUES'
     row_values = (recipe_id,recipe_name,instructions,cook_time_minutes,comment)
     placeholders_str = "(" + '?,' * len(row_values)
@@ -182,6 +185,10 @@ def deleteRecipe(recipe_id:int,db_connection_str:str):
         execute_script = f'DELETE FROM {str(table)} WHERE recipe_id={recipe_id}'
         with db_connection_str:
             db_connection_str.execute(execute_script)
+
+
+
+"""FUNCTIONS THAT ALTER A RECORD"""
 def addComment(recipe_id:int,db_connection,comment:str)->None:
     # todo- should auto update the updated_at column
     execute_script = 'UPDATE Recipe ' \
@@ -217,3 +224,11 @@ def toggleFav(recipe_id:int,db_connection)-> None:
         print('recipe favorited')
     else:
         print('recipe un-favorited')
+
+"""FUNCTIONS THAT RETURN TABLE INFO"""
+def getMaxRecipeId(db_connection):
+    execute_script = "SELECT MAX(recipe_id) FROM Recipe" # script to get the highest number
+    db_connection = sqlite3.connect(db_connection) # connect to database
+    with db_connection:
+        all_rows = db_connection.execute(execute_script) # execute the command
+    return all_rows.fetchone()[0] # return the highest recipe_id number

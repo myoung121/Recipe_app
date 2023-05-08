@@ -43,4 +43,4 @@ class NavBar(tk.Frame):
             elif button == 'home':
                 btn_home = tk.Button(frame_navigation, text='home', bg=bg_color, fg='yellow', border=False,
                                      command=lambda: controller.show_frame(HomePage.Home))
-                btn_home.grid(row=0, column=2) # goto home page
+                btn_home.grid(row=0, column=num) # goto home page
