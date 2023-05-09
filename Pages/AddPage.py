@@ -13,6 +13,7 @@ class Add(
     def __init__(self, parent, controller, page_info):
         tk.Frame.__init__(self, parent)
         self.BG_COLOR = page_info['bg_color'] # page background color
+        db_conn_str = page_info['db_conn']
         self.config(bg=self.BG_COLOR) # set background to color
         # FUNCTIONS
 
@@ -68,25 +69,29 @@ class Add(
             try:
 
                 recipe_name = entry_recipe_name.get() # get recipe name (not null)
+                recipe_ingreds = l_box_ingreds.get(0, tk.END)  # get all ingredients (not null)
+                recipe_instrs = l_box_instrs.get(0, tk.END)  # get all instructions (not null)
+
                 if not recipe_name: # recipe name blank
                     error_message += 'RECIPE NAME BLANK/ '
-                recipe_ingreds = l_box_ingreds.get(0, tk.END) # get all ingredients (not null)
                 if len(recipe_ingreds) == 0: # no ingredients in list
                     error_message += 'RECIPE INGREDIENTS BLANK/ '
-                recipe_instrs = l_box_instrs.get(0, tk.END) # get all instructions (not null)
                 if len(recipe_instrs) == 0: # no instructions in list
                     error_message += 'RECIPE INSTRUCTIONS BLANK/ '
                 if len(error_message) == message_start_len: # if error message has same amount of chars at start, no required user input is blank
                     recipe_cooktime = entry_recipe_ck_time.get()  # get the cooktime (can be null)
                     recipe_comment = entry_recipe_notes.get('1.0', tk.END)  # get the notes/ comment (can be null)
-                    recipe_fav = True  # (can be null)
                     # REMEMBER TO SET FAVORITE TO TRUE HERE TOO
-                    not_null_info = (
-                    recipe_name, recipe_ingreds, recipe_instrs, recipe_cooktime, recipe_comment, recipe_fav)
-                    pp.pprint(not_null_info)
-                    dFuncs.addRecipe(recipe_name=recipe_name,instructions=recipe_instrs)# add recipe to database
-
-                else:
+                    recipe_info = {'name':recipe_name,'ingred': recipe_ingreds, 'instrs':recipe_instrs,
+                                   'cktime': recipe_cooktime, 'comment':recipe_comment, 'favorite':True}
+                    pp.pprint(recipe_info)
+                    try:
+                        dFuncs.addRecipe(db_connection=db_conn_str,recipe_name=recipe_name,
+                                     instructions=recipe_instrs, ingredients=recipe_ingreds,
+                                     cook_time_minutes=recipe_cooktime,comment=recipe_comment)# add recipe to database
+                    except Exception as e:
+                        print(e)
+                else: # show pop-up for empty required fields
                     raise EntryError(error_message)
 
 

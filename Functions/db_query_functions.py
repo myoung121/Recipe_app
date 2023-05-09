@@ -156,9 +156,20 @@ def getImageRandom(db_connection_str:str,num_of_images:int=1,screen_sized=False,
 """FUNCTIONS THAT ALTER TABLE"""
 
 
-def addRecipe(recipe_name:str,db_connection, instructions:str,
-              unique_ingreds:tuple,
-              cook_time_minutes:int=0,comment:str=''):
+def addRecipe(db_connection,recipe_name:str,instructions,
+              ingredients,cook_time_minutes=0,comment:str='',favorite=True):
+    pre_load_checks ={'id_ok':False,'name_ok':False,
+                      'ingred_ok' : False,'instrs_ok' : False,
+                      'cktime_ok' : False,'comment_ok': False
+                      }
+    input_error_str = 'RECIPE INPUT ERROR: '
+    # input validation
+
+
+    class EntryError(Exception):
+        """EXCEPTION WRAPPER"""
+        pass
+
     def addIngredients(recipe_id: int, ingredients: tuple) -> None:
 
         pass
@@ -166,16 +177,60 @@ def addRecipe(recipe_name:str,db_connection, instructions:str,
     # todo - include addIngredients()
     # todo - make func to check if ingreds are unique and add them to ingred table
     # todo - make func to add ingred to recipe_ingred table
+    #----------------------------------------------------------------------------------------
+    # VALIDATE INPUTS
+    print('CHECKING RECIPE INFO...:')
+    # CHECK RECIPE ID
     recipe_id = getMaxRecipeId(db_connection) + 1 # set the recipe_id to the largest recipe_id in table + 1
-    exit(f'new recipe_id is {recipe_id}')
-    table_columns_str = 'Recipe(recipe_id, recipe_name, instr, cook_time, comment) VALUES'
+    try:
+        assert isinstance(recipe_id,int)
+        pre_load_checks['id_ok'] = True
+        print(f'\trecipe id-{recipe_id}-ok')
+    except AssertionError:
+        raise EntryError(input_error_str + 'RECIPE ID SHOULD BE AN INTEGER')
+
+    # CHECK RECIPE NAME
+    if recipe_name:
+        try:
+            assert validRecipeName(db_connection,recipe_name) == True
+            pre_load_checks['name'] = True
+            print(f'\trecipe name-{recipe_name}-ok')
+        except AssertionError:
+            raise EntryError(input_error_str + 'RECIPE NAME ALREADY IN USE')
+    else: # recipe name is blank
+        raise EntryError(input_error_str + 'RECIPE NAME IS BLANK')
+
+    # CHECK COOKTIME
+    if not cook_time_minutes:
+        cook_time_minutes = 0
+    try:
+        cook_time_minutes = int(cook_time_minutes)
+        assert cook_time_minutes >=0
+        pre_load_checks['cktime_ok'] = True
+        print(f'\tcook time-{cook_time_minutes}-ok')
+    except ValueError:
+        raise EntryError(input_error_str + 'COOK TIME SHOULD BE AN INTEGER')
+    except AssertionError:
+        raise EntryError(input_error_str + 'COOK TIME SHOULD BE GREATER THAN 0 MINUTES')
+
+    # CHECK COMMENT
+    # TODO - START HERE <------------------
+
+    #----------------------------------------------------------------------------------------
+
+    execute_script_str = 'INSERT INTO Recipe(recipe_id, recipe_name, instr, cook_time, comment) VALUES'
     row_values = (recipe_id,recipe_name,instructions,cook_time_minutes,comment)
     placeholders_str = "(" + '?,' * len(row_values)
     placeholders_str = placeholders_str[:-1] + ")"
-    execute_script_str = "INSERT INTO " + str(table_columns_str + placeholders_str)
+    execute_script_str +=  placeholders_str
+    exit(f'execute script is "{execute_script_str}\n'
+         f'pre-load check is {pre_load_checks}')
+
+
     with db_connection:
         db_connection.execute(execute_script_str,row_values)
     print('recipe added')
+
 
 def deleteRecipe(recipe_id:int,db_connection_str:str):
     """delete recipe record from database"""
@@ -230,5 +285,17 @@ def getMaxRecipeId(db_connection):
     execute_script = "SELECT MAX(recipe_id) FROM Recipe" # script to get the highest number
     db_connection = sqlite3.connect(db_connection) # connect to database
     with db_connection:
-        all_rows = db_connection.execute(execute_script) # execute the command
-    return all_rows.fetchone()[0] # return the highest recipe_id number
+        highest_id_num = db_connection.execute(execute_script) # execute the command
+
+    return highest_id_num.fetchone()[0] # return the highest recipe_id number
+
+def validRecipeName(db_connection,recipe_name):
+    execute_script = "SELECT recipe_id,recipe_name FROM Recipe WHERE recipe_name = ?"  # script to get recipe / recipe_name
+    db_connection = sqlite3.connect(db_connection)  # connect to database
+    recipe_name = recipe_name.lower().replace(' ','_')
+    with db_connection:
+        record = db_connection.execute(execute_script,(recipe_name,))  # execute the command
+    if record.fetchone():  # recipe name already exist
+        return False
+    else: # recipe name is unique
+        return True
