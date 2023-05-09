@@ -219,7 +219,20 @@ def addRecipe(db_connection,recipe_name:str,instructions,
         raise EntryError(input_error_str + 'COOK TIME SHOULD BE GREATER THAN 0 MINUTES')
 
     # CHECK COMMENT
-    # TODO - START HERE <------------------
+    if comment: # if user entered a comment
+        try:
+            assert isinstance(comment, str) # check if in correct data type
+            pre_load_checks['comment_ok'] = True
+            print(f'\tcomment-{comment}-ok')
+        except AssertionError:
+            raise EntryError(input_error_str + 'COMMENT SHOULD BE A STRING')
+
+    # CHECK INSTRUCTIONS
+    try:
+        assert isinstance(instructions,str)
+
+    except AssertionError:
+        raise EntryError(input_error_str + 'INSTRUCTIONS SHOULD BE A STRING')
 
     #----------------------------------------------------------------------------------------
 

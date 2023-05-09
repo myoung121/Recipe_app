@@ -19,7 +19,7 @@ class Add(
 
         def addIngred(event):
             """save ingredient to backend user ingredient list and onscreen listbox"""
-            user_ingred = entry_recipe_ingred.get()  # user input
+            user_ingred = entry_recipe_ingred.get().rstrip().lstrip()  # user input
             if user_ingred: # if entry isnt blank
                 if len(user_ingred) < 100 and str(user_ingred):  # limit amount of data user can input
                     if str(user_ingred) not in l_box_ingreds.get(0, tk.END): # if ingredient not already added to onscreen list
@@ -41,7 +41,7 @@ class Add(
 
         def addInstrs(event):
             """add instructions step onscreen listbox"""
-            user_instrs = entry_recipe_instrs.get()  # user input
+            user_instrs = entry_recipe_instrs.get().rstrip().lstrip()  # user input
             if user_instrs: # if entry isnt blank
                 if len(user_instrs) <= 250:  # limit amount of data user can input
                     if str(user_instrs) not in l_box_instrs.get(0, tk.END): # instruction not already added
@@ -78,9 +78,14 @@ class Add(
                     error_message += 'RECIPE INGREDIENTS BLANK/ '
                 if len(recipe_instrs) == 0: # no instructions in list
                     error_message += 'RECIPE INSTRUCTIONS BLANK/ '
+                else: pass
+                    #if len(recipe_instrs) ==1:
+                    #    recipe_instrs = recipe_instrs[0]
+                # TODO - START HERE <------------------ join instructions together with same chars used to split when pulling from database( right now using '. ' to split)
+                # todo - after that go back to input validation in dFuncs.addRecipe()
                 if len(error_message) == message_start_len: # if error message has same amount of chars at start, no required user input is blank
                     recipe_cooktime = entry_recipe_ck_time.get()  # get the cooktime (can be null)
-                    recipe_comment = entry_recipe_notes.get('1.0', tk.END)  # get the notes/ comment (can be null)
+                    recipe_comment = entry_recipe_notes.get('1.0', tk.END)[:-1]  # get the notes/ comment (can be null)
                     # REMEMBER TO SET FAVORITE TO TRUE HERE TOO
                     recipe_info = {'name':recipe_name,'ingred': recipe_ingreds, 'instrs':recipe_instrs,
                                    'cktime': recipe_cooktime, 'comment':recipe_comment, 'favorite':True}
