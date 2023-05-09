@@ -86,6 +86,7 @@ class Add(
                 if len(error_message) == message_start_len: # if error message has same amount of chars at start, no required user input is blank
                     recipe_cooktime = entry_recipe_ck_time.get()  # get the cooktime (can be null)
                     recipe_comment = entry_recipe_notes.get('1.0', tk.END)[:-1]  # get the notes/ comment (can be null)
+                    recipe_instrs = '. '.join(recipe_instrs) # change to string to store in database
                     # REMEMBER TO SET FAVORITE TO TRUE HERE TOO
                     recipe_info = {'name':recipe_name,'ingred': recipe_ingreds, 'instrs':recipe_instrs,
                                    'cktime': recipe_cooktime, 'comment':recipe_comment, 'favorite':True}

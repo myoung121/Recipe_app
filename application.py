@@ -49,7 +49,7 @@ class MyApp:
                 # __init__ function for class Tk
                 tk.Tk.__init__(self, *args, **kwargs)
                 self.geometry(WINDOW_SIZE) # set window size
-                self.resizable(width=True,height=False) # lock window size
+                self.resizable(width=False,height=False) # lock window size
                 # creating a container
                 container = tk.Frame(self)
                 container.pack(side="top", fill="both", expand=True)
