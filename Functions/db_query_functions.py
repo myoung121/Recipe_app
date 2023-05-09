@@ -192,11 +192,16 @@ def addRecipe(db_connection,recipe_name:str,instructions,
     # CHECK RECIPE NAME
     if recipe_name:
         try:
+            assert isinstance(recipe_name,str)
+        except AssertionError:
+            raise EntryError(input_error_str + 'RECIPE NAME SHOULD BE A STRING')
+        try:
             assert validRecipeName(db_connection,recipe_name) == True
             pre_load_checks['name'] = True
             print(f'\trecipe name-{recipe_name}-ok')
         except AssertionError:
             raise EntryError(input_error_str + 'RECIPE NAME ALREADY IN USE')
+
     else: # recipe name is blank
         raise EntryError(input_error_str + 'RECIPE NAME IS BLANK')
 
