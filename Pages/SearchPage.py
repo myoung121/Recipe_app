@@ -20,6 +20,10 @@ class Search(tk.Frame):
         MAX_PAGES = page_info['max_pages'] # number of pages that can be open at one time
         open_recipe_windows = page_info['open_pages'] # track recipes pages opened
         # get a background image
+        print('Search Page ', end='')
+        image_info = dbFuncs.getImageRandom(DB_STR)[0]
+        self.image_name = image_info[0].replace('_',' ')
+        self.image = image_info[1]
         def checkBoxControl(box_var: tk.Checkbutton):  # search page
             """this function makes sure only one check box is selected at a time"""
             chk_boxes = [chk_bx_recipe, chk_bx_title, chk_bx_ingred, chk_bx_instrs]
@@ -153,7 +157,11 @@ class Search(tk.Frame):
         frame_entry_w_btn.grid(row=3, column=1)  # ,columnspan=2)
 
         frame_side_btns = tk.Frame(self,bg=self.BG_COLOR)
-        frame_side_btns.grid(row=2, column=2)
+        frame_side_btns.grid(row=3, column=2)
+
+        frame_filler = tk.Frame(self,bg=self.BG_COLOR) # spacer
+        frame_filler.grid(row=2,column=2)
+
 
         # BUTTONS
         btn_banned = tk.Button(frame_banned_ingreds, text='-',bg=self.BG_COLOR,fg='white')
@@ -176,12 +184,12 @@ class Search(tk.Frame):
         lbl_banned = tk.Label(frame_banned_ingreds,
                               text=f'{"*" * 10}\nbanned\ningrdients\ngo\nhere\n^\n|\n{"*" * 10}',padx=5)
         lbl_banned.grid(row=1, column=1, columnspan=2)
-        print('Search Page ', end='')
-        image_info = dbFuncs.getImageRandom(DB_STR)[0]
-        self.image_name = image_info[0]
-        self.image = image_info[1]
         lbl_pic = tk.Label(frame_search_pic, image=self.image,padx=5)
         lbl_pic.grid(row=0, column=1)
+
+        lbl_image_name = tk.Label(frame_search_pic,bg=self.BG_COLOR,fg='white',text=self.image_name,
+                                  font=('Times New Roman',10))
+        lbl_image_name.grid(row=0,column=1,sticky='se')
 
         lbl_btm_blank = tk.Label(frame_side_btns, text='')
         lbl_btm_blank.grid(row=0, column=1, padx=15)
