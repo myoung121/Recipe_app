@@ -1,11 +1,7 @@
 """SEARCH PAGE"""
 import tkinter as tk
 from tkinter import messagebox
-import pprint as pp
-from PIL import Image, ImageTk
 from Functions import db_query_functions as dbFuncs
-
-import application as app
 from Functions import db_query_functions
 from Pages import RecipePage, HelpPage
 
@@ -18,8 +14,11 @@ class Search(tk.Frame):
     def __init__(self, parent, controller, navigation_dict):
         # dict needs: homePage,helpPage,addPage,db_str
         tk.Frame.__init__(self, parent)
-        self.config(bg=app.BG_COLOR)
+        self.BG_COLOR =navigation_dict['bg_color']
+        self.config(bg=self.BG_COLOR)
         test_db_str = navigation_dict['db_str']
+        MAX_PAGES = navigation_dict['max_pages'] # number of pages that can be open at one time
+        open_recipe_windows = navigation_dict['open_pages'] # track recipes pages opened
         # get a background image
         def checkBoxControl(box_var: tk.Checkbutton):  # search page
             """this function makes sure only one check box is selected at a time"""
@@ -88,11 +87,10 @@ class Search(tk.Frame):
                 # pp.pprint(selected_recipe[0])
                 # SET UP RECIPE SCREEN
                 # using toplevel screens
-                open_recipe_page = checkPages(selected_recipe[0]['name'], navigation_dict['open_pages'],
-                                              navigation_dict['max_pages'])  # check if allowed to open a new window
+                open_recipe_page = checkPages(selected_recipe[0]['name'], open_recipe_windows,MAX_PAGES)  # check if allowed to open a new window
                 if open_recipe_page:  # can show recipe
                     recipe_page = RecipePage.Recipe(selected_recipe[0], selected_recipe[1])
-                    app.open_recipes.append(recipe_page.recipe_name)
+                    open_recipe_windows.append(recipe_page.recipe_name)
                     print(f'opened {recipe_page.recipe_id}-{recipe_page.recipe_name} <-')
             except IndexError as e:  # if go button pressed while curser isnt on a recipe
                 pass
@@ -103,9 +101,8 @@ class Search(tk.Frame):
                                           navigation_dict['max_pages'])  # check if allowed to open a new window
             if open_recipe_page:  # can show recipe
                 recipe_page = RecipePage.Recipe(selected_item[0], selected_item[1])
-                app.open_recipes.append(recipe_page.recipe_name)
+                open_recipe_windows.append(recipe_page.recipe_name)
                 print(f'opened {recipe_page.recipe_id}-{recipe_page.recipe_name} <-')
-
 
         def deleteRecipe():
             selected_item = l_box_search.curselection()
@@ -127,35 +124,26 @@ class Search(tk.Frame):
             except IndexError as e:  # if delete button pressed while curser isnt on a recipe
                 print(e)
                 pass
-
         # --------------------------------------------------------------------------------------
-        # CANVAS
-
-        # BACKGROUND CANVAS
-        """canvas_bg = tk.Canvas(self)
-        canvas_bg.pack(fill='both',expand=True)
-        # set image in canvas
-        canvas_bg.create_image(0,0,image=self.bkrnd_image)
-        """
 
         # FRAME
 
-        frame_navigate = tk.Frame(self,bg=app.BG_COLOR)
+        frame_navigate = tk.Frame(self,bg=self.BG_COLOR)
         frame_navigate.grid(row=0, column=2)
 
-        frame_banned_ingreds = tk.Frame(self,bg=app.BG_COLOR)
+        frame_banned_ingreds = tk.Frame(self,bg=self.BG_COLOR)
         frame_banned_ingreds.grid(row=1, column=0)
 
-        frame_search_pic = tk.Frame(self,bg=app.BG_COLOR)
+        frame_search_pic = tk.Frame(self,bg=self.BG_COLOR)
         frame_search_pic.grid(row=1, column=1, columnspan=2,)
 
-        frame_toggles = tk.Frame(self,bg=app.BG_COLOR)
+        frame_toggles = tk.Frame(self,bg=self.BG_COLOR)
         frame_toggles.grid(row=2, column=1)
 
-        frame_entry_w_btn = tk.Frame(self,bg=app.BG_COLOR)
+        frame_entry_w_btn = tk.Frame(self,bg=self.BG_COLOR)
         frame_entry_w_btn.grid(row=3, column=1)  # ,columnspan=2)
 
-        frame_side_btns = tk.Frame(self,bg=app.BG_COLOR)
+        frame_side_btns = tk.Frame(self,bg=self.BG_COLOR)
         frame_side_btns.grid(row=2, column=2)
 
         # BUTTONS
@@ -168,20 +156,20 @@ class Search(tk.Frame):
         btn_quit = tk.Button(frame_navigate, text='quit', command=lambda: exit('QUIT'))
         btn_quit.grid(row=0, column=3)
 
-        btn_banned = tk.Button(frame_banned_ingreds, text='+')
+        btn_banned = tk.Button(frame_banned_ingreds, text='-',bg=self.BG_COLOR,fg='white')
         btn_banned.grid(row=0, column=1)
 
-        btn_go = tk.Button(frame_side_btns, text='go', command=lambda: recipeSelect(event=None))
+        btn_go = tk.Button(frame_side_btns, text='go', bg=self.BG_COLOR,fg='white',command=lambda: recipeSelect(event=None))
         btn_go.grid(row=0, column=0)
-        btn_random = tk.Button(frame_side_btns, text='random', command=randomRecipe)
+        btn_random = tk.Button(frame_side_btns, text='random',bg=self.BG_COLOR,fg='white',command=randomRecipe)
         btn_random.grid(row=0, column=1)
-        btn_favorites = tk.Button(frame_side_btns,text='favs')
+        btn_favorites = tk.Button(frame_side_btns,text='favs',bg=self.BG_COLOR,fg='white')
         btn_favorites.grid(row=0,column=2)
 
-        btn_entry = tk.Button(frame_entry_w_btn, text='enter', command=search)
+        btn_entry = tk.Button(frame_entry_w_btn, text='enter',bg=self.BG_COLOR,fg='white',command=search)
         btn_entry.grid(row=0, column=1)
         # confirm before deleting
-        btn_delete = tk.Button(self, text='delete', command=deleteRecipe)  # deletes recipe from database
+        btn_delete = tk.Button(self, text='delete',bg=self.BG_COLOR,fg='white',command=deleteRecipe)  # deletes recipe from database
         btn_delete.grid(row=2, column=0)
 
         # LABEL

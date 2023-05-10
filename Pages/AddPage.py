@@ -1,7 +1,6 @@
 """ADD RECIPE PAGE"""
 
 import tkinter as tk
-import pprint as pp
 from tkinter import scrolledtext
 from Widgets import NavBar
 from Functions import db_query_functions as dFuncs
