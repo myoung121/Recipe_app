@@ -9,7 +9,7 @@ import application as app
 from Functions import db_query_functions
 from Pages import RecipePage, HelpPage
 
-
+# todo- when opening a newly created recipe  throws error b/c it doesnt have an image. handle errors in the db func calls/ maybe could return a random image instead
 class Search(tk.Frame):
     rows = []
     user_last_search_str = ''  # users last searched words
