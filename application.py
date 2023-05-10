@@ -65,7 +65,7 @@ class MyApp:
                                               (home_nav,search_nav,add_nav),parent=container)
 
                 # start on the home page
-                self.show_frame(AddPage.Add)
+                self.show_frame(SearchPage.Search)
                 self.title('RecipeApp 1.0')
 
             # to display the current frame passed as parameter

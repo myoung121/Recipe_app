@@ -156,29 +156,61 @@ def getImageRandom(db_connection_str:str,num_of_images:int=1,screen_sized=False,
 # --------------------------------------------------------------
 """FUNCTIONS THAT ALTER TABLE"""
 
-
 def addRecipe(db_connection,recipe_name:str,instructions,
               ingredients,cook_time_minutes=0,comment:str='',favorite=True):
+
     pre_load_checks ={'id_ok':False,'name_ok':False,
                       'ingred_ok' : False,'instrs_ok' : False,
                       'cktime_ok' : False,'comment_ok': False
                       }
-    input_error_str = 'RECIPE INPUT ERROR: '
-    # input validation
 
+
+    # CUSTOM EXCEPTIONS
+    input_error_str = 'RECIPE INPUT ERROR: '
+    data_error_str = 'RECIPE DATA ERROR: '
 
     class EntryError(Exception):
-        """EXCEPTION WRAPPER"""
+        """INPUT ERRORS EXCEPTION WRAPPER"""
+        pass
+    class DataError(Exception):
+        """DATA LOAD,PREP, SEARCH, OTHER DATA ERRORS EXCEPTION WRAPPER"""
         pass
 
+    #########################################################
+    # FUNCTIONS THAT ADD TO TABLES
+    def addIngredient(db_connection1,ingred_id_ingred_pair:tuple|str):
+        #print('\tadding NEW ingred to Ingredient table...')
+        execute_script = 'INSERT INTO Ingredient (ingred_id,ingred_name) VALUES (?,?)'
+        db_connection1 = sqlite3.connect(db_connection1)
+        with db_connection1:
+            db_connection1.execute(execute_script,(*ingred_id_ingred_pair,))
+            print(f'\t+ ingredient added +')
 
-    # todo - should auto update the created_at and updated_at columns
-    # todo - include addIngredients()
-    # todo - make func to check if ingreds are unique and add them to ingred table
-    # todo - make func to add ingred to recipe_ingred table
+    def addRecipeIngredient(db_connection1,recipe_ingred_ids_pair:tuple|str):
+        """add recipe_id and ingred_id to database"""
+        #print('\tadding NEW recipe,ingred to RecipeIngredient table...')
+        execute_script = 'INSERT INTO RecipeIngredient (recipe_id,ingred_id) VALUES (?,?)'
+        db_connection1 = sqlite3.connect(db_connection1)
+        with db_connection1:
+            db_connection1.execute(execute_script,(*recipe_ingred_ids_pair,))
+            print(f'\t+ recipe ingredient added +')
+
+    def addRecipeInfo(db_connection1,record_values:tuple|str):
+        """add values to columns recipe_id, recipe_name, instr, cook_time, comment, favorite to recipe table"""
+        #print('\tadding NEW recipe to Recipe table...')
+        execute_script = 'INSERT INTO Recipe(recipe_id, recipe_name, instr, cook_time, comment, favorite) VALUES'
+        placeholders_str = "(" + '?,' * len(record_values)
+        placeholders_str = placeholders_str[:-1] + ")"
+        execute_script += placeholders_str
+        db_connection1 = sqlite3.connect(db_connection1)
+        with db_connection1:
+            db_connection1.execute(execute_script, (*record_values,))
+            print(f'\t+ recipe info added +')
+    #########################################################
     #----------------------------------------------------------------------------------------
     # VALIDATE INPUTS
-    print('CHECKING RECIPE INFO...:')
+
+    print('CHECKING RECIPE INFO...')
     # CHECK RECIPE ID
     recipe_id = getMaxIdNum(db_connection,'recipe_id','Recipe') + 1 # set the recipe_id to the largest recipe_id in table + 1
     try:
@@ -192,15 +224,15 @@ def addRecipe(db_connection,recipe_name:str,instructions,
     if recipe_name:
         try:
             assert isinstance(recipe_name,str)
+            recipe_name = recipe_name.lower()
         except AssertionError:
             raise EntryError(input_error_str + 'RECIPE NAME SHOULD BE A STRING')
         try:
             assert validRecipeName(db_connection,recipe_name) == True
             pre_load_checks['name_ok'] = True
-            print(f'\trecipe name-{recipe_name}-ok')
+            print(f'\trecipe name-{recipe_name[:10]}-ok')
         except AssertionError:
             raise EntryError(input_error_str + 'RECIPE NAME ALREADY IN USE')
-
     else: # recipe name is blank
         raise EntryError(input_error_str + 'RECIPE NAME IS BLANK')
 
@@ -222,7 +254,7 @@ def addRecipe(db_connection,recipe_name:str,instructions,
         try:
             assert isinstance(comment, str) # check if in correct data type
             pre_load_checks['comment_ok'] = True
-            print(f'\tcomment-{comment}-ok')
+            print(f'\tcomment-{comment[:10]}-ok')
         except AssertionError:
             raise EntryError(input_error_str + 'COMMENT SHOULD BE A STRING')
 
@@ -230,15 +262,9 @@ def addRecipe(db_connection,recipe_name:str,instructions,
     try:
         assert isinstance(instructions,str)
         pre_load_checks['instrs_ok'] = True
-        print(f'\tinstrs-{instructions}-ok')
+        print(f'\tinstrs-{instructions[:10]}...-ok')
     except AssertionError:
         raise EntryError(input_error_str + 'INSTRUCTIONS SHOULD BE A STRING')
-
-    #########################################################
-    def addIngredient(recipe_id: int, ingredients: tuple):
-
-        pass
-    #########################################################
 
     # CHECK INGREDIENTS
     try:
@@ -251,38 +277,43 @@ def addRecipe(db_connection,recipe_name:str,instructions,
     for num,food in enumerate(ingredients): # check each item in the sequence
         food_unique = isUniqueIngred(db_connection,food)
         if food_unique[0]: # if ingredient not in database
-            print(f'{food} is unique')
             ingreds_made += 1
             ingred_id  =  highest_ingred_id + ingreds_made # get the primary key (id_num) for new imgred
             ingredients_ids.append(ingred_id)
         else:
-            print(f'{food} is not unique')
-
             ingredients_ids.append(food_unique[1])  # add id num to list
-    pprint.pprint(f'ingredient ids are {ingredients_ids}')
     try:
-        assert len(ingredients_ids) == len(ingredients)
+        ingreds_loadable = tuple(zip(ingredients_ids,ingredients))
+        assert len(ingredients_ids) == len(ingreds_loadable)
+        pre_load_checks['ingreds_ok'] = True
+        print(f'\tingreds--ok')
     except AssertionError:
-        raise EntryError(input_error_str + 'COULNDT GET INGREDIENT_ID FOR ALL INGREDIENTS')
-    # MAKE FUNCTION TO ADD INGREDS WITH ID NUMS GREATER THAN HIGHEST_INGRED_ID TO DB
-    print('add NEW ingreds to Ingredient table')
-    # addIngredient()
-    # use with recipe_id and add to RecipeIngredient table
-    print('add all to RecipeIngredient table')
+        raise DataError(data_error_str + 'COULDN\'T MATCH ALL INGREDIENTS TO IDS')
+
+    # ADD RECIPE INFO
+    row_values = (recipe_id, recipe_name, instructions, cook_time_minutes, comment, True)
+    try:
+        addRecipeInfo(db_connection, row_values)
+    except Exception as e:
+        raise DataError(f'ADDING RECIPE INFO-{data_error_str}{e}')
+
+    # ADD INGREDIENTS
+    for new_ingred_pair in ingreds_loadable: #
+        if new_ingred_pair[0] > highest_ingred_id: # if ingred has new id number
+            try:
+                addIngredient(db_connection,new_ingred_pair)
+            except Exception as e:
+                raise DataError(f'ADDING INGREDIENTS-{data_error_str}{e}')
+
+    # ADD RECIPE INGREDIENTS
+    for item in ingreds_loadable:
+        try:
+            addRecipeIngredient(db_connection,(recipe_id,item[0])) # add to table using recipe_id,ingred_id
+        except Exception as e:
+            raise DataError(f'ADDING RECIPE INGREDIENTS-{data_error_str}{e}')
+
+    print('RECIPE SUCCESSFULLY ADDED')
     #----------------------------------------------------------------------------------------
-
-    execute_script_str = 'INSERT INTO Recipe(recipe_id, recipe_name, instr, cook_time, comment) VALUES'
-    row_values = (recipe_id,recipe_name,instructions,cook_time_minutes,comment)
-    placeholders_str = "(" + '?,' * len(row_values)
-    placeholders_str = placeholders_str[:-1] + ")"
-    execute_script_str +=  placeholders_str
-    print(f'execute script is "{execute_script_str}\n'
-         f'pre-load check is {pre_load_checks}')
-
-
-"""    with db_connection:
-        db_connection.execute(execute_script_str,row_values)
-    print('recipe added')"""
 
 
 def deleteRecipe(recipe_id:int,db_connection_str:str):
