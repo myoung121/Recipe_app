@@ -131,13 +131,16 @@ def getRecipeInfo(recipe_id: int, db_connection_str:str) -> (dict, bytes):  # sh
                 for num, food in enumerate(stats):
                     recipe_info['ingredients'].append(unique_ingreds[int(food[1])][1])
             elif item_rows == 'Image':
-                with db_connection_str:
+                with db_connection:
                     stats = db_connection.execute(execute_script_str)
                     stats = stats.fetchall()[0]
                 recipe_info['image_name'] = stats[2].replace('_', " ").title()
                 image_blob = stats[3]
         except Exception as e:
-            print(f'Error in getRecipeInfo():\n{e}')
+            if 'list index' in str(e): # ignore index error here. It throws if no image and is handled at end of iteration
+                pass
+            else:
+                print(f'Error in getRecipeInfo():\n{e}')
     try:
         return recipe_info, image_blob
     except UnboundLocalError: # catch if recipe doesnt have an image

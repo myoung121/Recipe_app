@@ -45,10 +45,12 @@ class Recipe(tk.Toplevel):
             self.favorite = False
         if not self.recipe_comment:
             self.recipe_comment = ''
-
-        # convert image bytes to file-like object
-        pic = Image.open(io.BytesIO(recipe_image_blob))  # convert image bytes to PIL image format(jpeg)
-        self.recipe_pic = ImageTk.PhotoImage(pic)
+        try:
+            # convert image bytes to file-like object
+            pic = Image.open(io.BytesIO(recipe_image_blob))  # convert image bytes to PIL image format(jpeg)
+            self.recipe_pic = ImageTk.PhotoImage(pic)
+        except TypeError: # when opening user created recipe, the image is already built b/c it uses getImageRandom() so just need to add to window.
+            self.recipe_pic = recipe_image_blob
         width = '800'
         height = '700'
         self.geometry(f'{width}x{height}')
