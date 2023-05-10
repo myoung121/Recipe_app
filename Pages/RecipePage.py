@@ -45,6 +45,7 @@ class Recipe(tk.Toplevel):
             self.favorite = False
         if not self.recipe_comment:
             self.recipe_comment = ''
+
         # convert image bytes to file-like object
         pic = Image.open(io.BytesIO(recipe_image_blob))  # convert image bytes to PIL image format(jpeg)
         self.recipe_pic = ImageTk.PhotoImage(pic)

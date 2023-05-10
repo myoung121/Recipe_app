@@ -3,66 +3,10 @@ import random as ran
 import sqlite3
 from PIL import Image, ImageTk
 import  io
-""" FUNCTIONS THAT RETURN A SINGLE FORMATTED RECIPE RECORD / INFO"""
 
 
-def getRecipeInfo(recipe_id: int, db_connection_str:str) -> (dict, bytes):  # show recipe button
-    table_names: tuple = ('Recipe', 'RecipeIngredient', 'Image')
-    recipe_info = {}
-    unique_ingreds = getRowsAll('Ingredient',db_connection_str)
-    db_connection_str = sqlite3.connect(db_connection_str)
-    for item_rows in table_names:
-        try:
-
-            execute_script_str = f'SELECT * ' \
-                                 f'FROM  {item_rows} ' \
-                                 f'WHERE recipe_id = {recipe_id}'
-            if item_rows == 'Recipe':
-                with db_connection_str:
-                    stats = db_connection_str.execute(execute_script_str)
-                    stats = stats.fetchall()[0]
-                recipe_info['recipe_id'] = stats[0]
-                recipe_info['name'] = stats[1].replace('_', ' ').title()
-                recipe_info['instr'] = stats[2]
-                recipe_info['prep_time'] = stats[3]
-                recipe_info['cook_time'] = stats[4]
-                recipe_info['comment'] = stats[5]
-                recipe_info['created_time'] = stats[6]
-                recipe_info['updated_time'] = stats[7]
-                recipe_info['favorite'] = stats[8]
-            elif item_rows == 'RecipeIngredient':
-                recipe_info['ingredients'] = []
-                with db_connection_str:
-                    stats = db_connection_str.execute(execute_script_str)
-                    stats = stats.fetchall()
-                for num, food in enumerate(stats):
-                    recipe_info['ingredients'].append(unique_ingreds[int(food[1])][1])
-            elif item_rows == 'Image':
-                with db_connection_str:
-                    stats = db_connection_str.execute(execute_script_str)
-                    stats = stats.fetchall()[0]
-                recipe_info['image_name'] = stats[2].replace('_', " ").title()
-                image_blob = stats[3]
-        except Exception as e:
-            print(f'Error in getRecipeInfo():\n{e}')
-    return recipe_info, image_blob
 
 
-def getRecipeInfoRandom(db_connection_str:str) -> (dict, bytes):  # random recipe button
-    # todo - chech todo.txt
-    # get all recipe_ids in table
-    execute_script = 'SELECT recipe_id FROM Recipe'
-    db_connection = sqlite3.connect(db_connection_str)
-    with db_connection:
-        all_ids = db_connection.execute(execute_script)
-    all_ids = all_ids.fetchall()
-    # pick a random recipe_id and get the id number alone
-    ran_recipe_num = ran.sample(all_ids,1)[0][0]
-    # pass recipe_id into function to get recipe info
-    return getRecipeInfo(recipe_id=ran_recipe_num, db_connection_str=db_connection_str)
-
-
-# -------------------------------------------------------------------------------
 """FUNCTIONS THAT RETURN RECIPE RECORD INFO"""
 
 
@@ -151,9 +95,75 @@ def getImageRandom(db_connection_str:str,num_of_images:int=1,screen_sized=False,
         print(j[0],end='/ ')
     print()
     return random_jpeg_images
-    # todo - check if this runs correctly
 
 # --------------------------------------------------------------
+
+""" FUNCTIONS THAT RETURN A SINGLE FORMATTED RECIPE RECORD / INFO"""
+def getRecipeInfo(recipe_id: int, db_connection_str:str) -> (dict, bytes):  # show recipe button
+    table_names: tuple = ('Recipe', 'RecipeIngredient', 'Image') # IMAGE MUST BE LAST!!!
+    recipe_info = {}
+    unique_ingreds = getRowsAll('Ingredient',db_connection_str)
+    db_connection = sqlite3.connect(db_connection_str)
+    for item_rows in table_names:
+        try:
+
+            execute_script_str = f'SELECT * ' \
+                                 f'FROM  {item_rows} ' \
+                                 f'WHERE recipe_id = {recipe_id}'
+            if item_rows == 'Recipe':
+                with db_connection:
+                    stats = db_connection.execute(execute_script_str)
+                    stats = stats.fetchall()[0]
+                recipe_info['recipe_id'] = stats[0]
+                recipe_info['name'] = stats[1].replace('_', ' ').title()
+                recipe_info['instr'] = stats[2]
+                recipe_info['prep_time'] = stats[3]
+                recipe_info['cook_time'] = stats[4]
+                recipe_info['comment'] = stats[5]
+                recipe_info['created_time'] = stats[6]
+                recipe_info['updated_time'] = stats[7]
+                recipe_info['favorite'] = stats[8]
+            elif item_rows == 'RecipeIngredient':
+                recipe_info['ingredients'] = []
+                with db_connection:
+                    stats = db_connection.execute(execute_script_str)
+                    stats = stats.fetchall()
+                for num, food in enumerate(stats):
+                    recipe_info['ingredients'].append(unique_ingreds[int(food[1])][1])
+            elif item_rows == 'Image':
+                with db_connection_str:
+                    stats = db_connection.execute(execute_script_str)
+                    stats = stats.fetchall()[0]
+                recipe_info['image_name'] = stats[2].replace('_', " ").title()
+                image_blob = stats[3]
+        except Exception as e:
+            print(f'Error in getRecipeInfo():\n{e}')
+    try:
+        return recipe_info, image_blob
+    except UnboundLocalError: # catch if recipe doesnt have an image
+        # GET a random image
+        ran_image = getImageRandom(db_connection_str)[0]
+        recipe_info['image_name'] = ran_image[0].replace('_', " ").title() # add image name to info
+        image_blob = ran_image[1]# save image
+        return recipe_info,image_blob# return recipe info and dict
+
+
+def getRecipeInfoRandom(db_connection_str:str) -> (dict, bytes):  # random recipe button
+    # todo - chech todo.txt
+    # get all recipe_ids in table
+    execute_script = 'SELECT recipe_id FROM Recipe'
+    db_connection = sqlite3.connect(db_connection_str)
+    with db_connection:
+        all_ids = db_connection.execute(execute_script)
+    all_ids = all_ids.fetchall()
+    # pick a random recipe_id and get the id number alone
+    ran_recipe_num = ran.sample(all_ids,1)[0][0]
+    # pass recipe_id into function to get recipe info
+    return getRecipeInfo(recipe_id=ran_recipe_num, db_connection_str=db_connection_str)
+
+
+# -------------------------------------------------------------------------------
+
 """FUNCTIONS THAT ALTER TABLE"""
 
 def addRecipe(db_connection,recipe_name:str,instructions,

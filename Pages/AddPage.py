@@ -125,12 +125,12 @@ class Add(
         entry_recipe_name = tk.Entry(frame_entries_left) # recipe name input box
         entry_recipe_name.grid(row=1, column=0, pady=1)
 
+        entry_recipe_ck_time = tk.Entry(frame_entries_right, width=4) # cook time input box
+        entry_recipe_ck_time.grid(row=1, column=0, pady=1)
+
         entry_recipe_ingred = tk.Entry(frame_entries_right) # ingredients input box
         entry_recipe_ingred.grid(row=3, column=0, pady=1)
         entry_recipe_ingred.bind('<Return>', addIngred)  # add ingredient to display when enter is pressed
-
-        entry_recipe_ck_time = tk.Entry(frame_entries_right, width=4) # cook time input box
-        entry_recipe_ck_time.grid(row=1, column=0, pady=1)
 
         entry_recipe_instrs = tk.Entry(frame_entries_right)  # instructions input box
         entry_recipe_instrs.grid(row=5, column=0, pady=1)

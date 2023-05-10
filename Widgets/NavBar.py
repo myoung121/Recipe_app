@@ -41,6 +41,6 @@ class NavBar(tk.Frame):
                                      command=lambda: exit('QUIT'))  # quit / close app
                 btn_quit.grid(row=0, column=num, padx=0)
             elif button == 'home':
-                btn_home = tk.Button(frame_navigation, text='home', bg=bg_color, fg='yellow', border=False,
+                btn_home = tk.Button(frame_navigation, text='home', bg=bg_color, fg='green', border=False,
                                      command=lambda: controller.show_frame(HomePage.Home))
                 btn_home.grid(row=0, column=num) # goto home page
