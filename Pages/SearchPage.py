@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 from Functions import db_query_functions as dbFuncs
 from Functions import db_query_functions
-from Pages import RecipePage, HelpPage
+from Widgets import NavBar
 
 # todo- when opening a newly created recipe  throws error b/c it doesnt have an image. handle errors in the db func calls/ maybe could return a random image instead
 class Search(tk.Frame):
@@ -11,14 +11,14 @@ class Search(tk.Frame):
     user_last_search_str = ''  # users last searched words
     user_last_filter = 'name'  # users last filter applied
 
-    def __init__(self, parent, controller, navigation_dict):
+    def __init__(self, parent, controller, page_info):
         # dict needs: homePage,helpPage,addPage,db_str
         tk.Frame.__init__(self, parent)
-        self.BG_COLOR =navigation_dict['bg_color']
+        self.BG_COLOR =page_info['bg_color']
         self.config(bg=self.BG_COLOR)
-        test_db_str = navigation_dict['db_str']
-        MAX_PAGES = navigation_dict['max_pages'] # number of pages that can be open at one time
-        open_recipe_windows = navigation_dict['open_pages'] # track recipes pages opened
+        DB_STR = page_info['db_str']
+        MAX_PAGES = page_info['max_pages'] # number of pages that can be open at one time
+        open_recipe_windows = page_info['open_pages'] # track recipes pages opened
         # get a background image
         def checkBoxControl(box_var: tk.Checkbutton):  # search page
             """this function makes sure only one check box is selected at a time"""
@@ -27,8 +27,9 @@ class Search(tk.Frame):
             for x in chk_boxes:
                 if x:
                     x.deselect()
+                    x.config(fg='white')
             box_var.select()
-
+            box_var.config(fg='green')
         def checkBoxStatus(getToggle: bool = False, toggleKey: str = ''):  # search page
             """this function returns name of which text box is selected or None"""
             chk_boxes = {'recipe_id': recipe_toggle, 'name': title_toggle,
@@ -45,12 +46,12 @@ class Search(tk.Frame):
             if not entry_search_text.get():  # empty entry
                 pass
                 checkBoxControl(chk_bx_title)  # set default search field to recipe name
-                rows = db_query_functions.getFilteredRecipes(search_txt='', db_connection_str=test_db_str,
+                rows = db_query_functions.getFilteredRecipes(search_txt='', db_connection_str=DB_STR,
                                                              user_filter=checkBoxStatus(),
                                                              return_all=True)  # return all recipes
             else:
                 rows = db_query_functions.getFilteredRecipes(search_txt=entry_search_text.get(),
-                                                             db_connection_str=test_db_str,
+                                                             db_connection_str=DB_STR,
                                                              user_filter=checkBoxStatus())  # return filtered recipes
             # Add items to the search listbox
             for item in rows:
@@ -83,27 +84,35 @@ class Search(tk.Frame):
             # Do something with the selected item
             try:
                 selected_recipe = db_query_functions.getRecipeInfo(recipe_id=rows[selected_item[0]][0],
-                                                                   db_connection_str=test_db_str)
+                                                                   db_connection_str=DB_STR)
                 # pp.pprint(selected_recipe[0])
                 # SET UP RECIPE SCREEN
                 # using toplevel screens
                 open_recipe_page = checkPages(selected_recipe[0]['name'], open_recipe_windows,MAX_PAGES)  # check if allowed to open a new window
                 if open_recipe_page:  # can show recipe
-                    recipe_page = RecipePage.Recipe(selected_recipe[0], selected_recipe[1])
+                    recipe_page = page_info['recipe_page'](selected_recipe[0], selected_recipe[1])
                     open_recipe_windows.append(recipe_page.recipe_name)
                     print(f'opened {recipe_page.recipe_id}-{recipe_page.recipe_name} <-')
             except IndexError as e:  # if go button pressed while curser isnt on a recipe
                 pass
 
         def randomRecipe():
-            selected_item = db_query_functions.getRecipeInfoRandom(db_connection_str=test_db_str)
-            open_recipe_page = checkPages(selected_item[0]['name'], navigation_dict['open_pages'],
-                                          navigation_dict['max_pages'])  # check if allowed to open a new window
+            selected_item = db_query_functions.getRecipeInfoRandom(db_connection_str=DB_STR)
+            open_recipe_page = checkPages(selected_item[0]['name'], page_info['open_pages'],
+                                          page_info['max_pages'])  # check if allowed to open a new window
             if open_recipe_page:  # can show recipe
-                recipe_page = RecipePage.Recipe(selected_item[0], selected_item[1])
+                recipe_page = page_info['recipe_page'](selected_item[0], selected_item[1])
                 open_recipe_windows.append(recipe_page.recipe_name)
                 print(f'opened {recipe_page.recipe_id}-{recipe_page.recipe_name} <-')
 
+        def getFavs():
+            """when fav button pressed queries db for favorite recipes and ads to search box"""
+            favs = dbFuncs.getFavorites(DB_STR) # get favorite recipes from database
+            l_box_search.delete(0, tk.END) # clear the displayed recipes
+            for item in favs:
+                item = list(item) # change type to edit elements
+                item[1]=item[1].replace('_',' ')
+                l_box_search.insert(tk.END, f'{item[0]}. {item[1].title()}') # add recipe info to display
         def deleteRecipe():
             selected_item = l_box_search.curselection()
             try:
@@ -117,7 +126,7 @@ class Search(tk.Frame):
                                                    message=f'DELETE\n{rows[selected_item[0]][1].replace("_", " ").title()}?')  # prompt user to confirm recipe deletion
                 if confirmed == 'yes':
                     db_query_functions.deleteRecipe(recipe_id=int(recipe_db_id),
-                                                    db_connection_str=test_db_str)  # delete recipe from db
+                                                    db_connection_str=DB_STR)  # delete recipe from db
                     rows.pop(selected_item[0])  # delete recipe from stored recipe search
                     l_box_search.delete(selected_item[0])  # delete recipe from listbox
                     print(f'deleted {recipe_db_id}-{recipe_name} -X')
@@ -128,8 +137,8 @@ class Search(tk.Frame):
 
         # FRAME
 
-        frame_navigate = tk.Frame(self,bg=self.BG_COLOR)
-        frame_navigate.grid(row=0, column=2)
+        NavBar.NavBar(self,controller,2,self.BG_COLOR,('help','add','home','quit'))  # navigation frame / buttons
+
 
         frame_banned_ingreds = tk.Frame(self,bg=self.BG_COLOR)
         frame_banned_ingreds.grid(row=1, column=0)
@@ -147,15 +156,6 @@ class Search(tk.Frame):
         frame_side_btns.grid(row=2, column=2)
 
         # BUTTONS
-        btn_help = tk.Button(frame_navigate, text='help', command=lambda: HelpPage.Help())
-        btn_help.grid(row=0, column=0)
-        btn_add = tk.Button(frame_navigate, text='add', command=lambda: controller.show_frame(navigation_dict['add']))
-        btn_add.grid(row=0, column=1)
-        btn_home = tk.Button(frame_navigate, text='home', command=lambda: controller.show_frame(navigation_dict['home']))
-        btn_home.grid(row=0, column=2)
-        btn_quit = tk.Button(frame_navigate, text='quit', command=lambda: exit('QUIT'))
-        btn_quit.grid(row=0, column=3)
-
         btn_banned = tk.Button(frame_banned_ingreds, text='-',bg=self.BG_COLOR,fg='white')
         btn_banned.grid(row=0, column=1)
 
@@ -163,7 +163,7 @@ class Search(tk.Frame):
         btn_go.grid(row=0, column=0)
         btn_random = tk.Button(frame_side_btns, text='random',bg=self.BG_COLOR,fg='white',command=randomRecipe)
         btn_random.grid(row=0, column=1)
-        btn_favorites = tk.Button(frame_side_btns,text='favs',bg=self.BG_COLOR,fg='white')
+        btn_favorites = tk.Button(frame_side_btns,text='favs',bg=self.BG_COLOR,fg='white',command=getFavs)
         btn_favorites.grid(row=0,column=2)
 
         btn_entry = tk.Button(frame_entry_w_btn, text='enter',bg=self.BG_COLOR,fg='white',command=search)
@@ -177,7 +177,7 @@ class Search(tk.Frame):
                               text=f'{"*" * 10}\nbanned\ningrdients\ngo\nhere\n^\n|\n{"*" * 10}',padx=5)
         lbl_banned.grid(row=1, column=1, columnspan=2)
         print('Search Page ', end='')
-        image_info = dbFuncs.getImageRandom(test_db_str)[0]
+        image_info = dbFuncs.getImageRandom(DB_STR)[0]
         self.image_name = image_info[0]
         self.image = image_info[1]
         lbl_pic = tk.Label(frame_search_pic, image=self.image,padx=5)
@@ -201,22 +201,22 @@ class Search(tk.Frame):
         # CHECKBOX
         recipe_toggle = tk.IntVar()
         chk_bx_recipe = tk.Checkbutton(frame_toggles, text='recipe_id',
-                                       variable=recipe_toggle, command=lambda: checkBoxControl(chk_bx_recipe))
+                                       variable=recipe_toggle, bg=self.BG_COLOR,fg='white',command=lambda: checkBoxControl(chk_bx_recipe))
         chk_bx_recipe.grid(row=0, column=1, padx=5)
 
         title_toggle = tk.IntVar()
         chk_bx_title = tk.Checkbutton(frame_toggles, text='name',
-                                      variable=title_toggle, command=lambda: checkBoxControl(chk_bx_title))
+                                      variable=title_toggle, bg=self.BG_COLOR,fg='white',command=lambda: checkBoxControl(chk_bx_title))
         chk_bx_title.grid(row=0, column=0, padx=5)
         chk_bx_title.select()  # this box is selected by default
 
         ingred_toggle = tk.IntVar()
         chk_bx_ingred = tk.Checkbutton(frame_toggles, text='ingredient',
-                                       variable=ingred_toggle, command=lambda: checkBoxControl(chk_bx_ingred))
+                                       variable=ingred_toggle, bg=self.BG_COLOR,fg='white',command=lambda: checkBoxControl(chk_bx_ingred))
         chk_bx_ingred.grid(row=0, column=2, padx=5)
 
         instrs_toggle = tk.IntVar()
-        chk_bx_instrs = tk.Checkbutton(frame_toggles, text='instruction',
+        chk_bx_instrs = tk.Checkbutton(frame_toggles, text='instruction',bg=self.BG_COLOR,fg='white',
                                        variable=instrs_toggle, command=lambda: checkBoxControl(chk_bx_instrs))
         chk_bx_instrs.grid(row=0, column=3, padx=5)
 

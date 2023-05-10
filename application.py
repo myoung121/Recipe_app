@@ -2,7 +2,7 @@ import logging
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
 from PIL import Image, ImageTk
-from Pages import HomePage,SearchPage, AddPage, HelpPage
+from Pages import HomePage,SearchPage, AddPage, HelpPage, RecipePage
 import pprint as pp
 
 
@@ -57,8 +57,7 @@ class MyApp:
                 container.grid_rowconfigure(0, weight=1)
                 container.grid_columnconfigure(0, weight=1)
                 home_nav = {'bg_color':BG_COLOR,'db_str':DB_STR,'win_size':WINDOW_SIZE}
-                search_nav = {'help':HelpPage.Help,'add':AddPage.Add,'home':HomePage.Home,
-                              'db_str':test_db_str,'open_pages':open_recipes,
+                search_nav = {'recipe_page':RecipePage.Recipe,'db_str':test_db_str,'open_pages':open_recipes,
                               'max_pages':MAX_OPEN_RECIPES,'bg_color':BG_COLOR}
                 add_nav = {'bg_color':BG_COLOR,'win_size':WINDOW_SIZE,'db_conn':DB_STR,'help':HelpPage.Help,'home':HomePage.Home,'search':SearchPage.Search}
                 self.frames = self.makeFrames((HomePage.Home, SearchPage.Search, AddPage.Add),

@@ -96,6 +96,13 @@ def getImageRandom(db_connection_str:str,num_of_images:int=1,screen_sized=False,
     print()
     return random_jpeg_images
 
+def getFavorites(db_connection_str):
+    """get favorite recipes"""
+    execute_script = 'SELECT recipe_id,recipe_name FROM Recipe WHERE favorite = True' # query to get favorited recipes from table
+    db_conn =  sqlite3.connect(db_connection_str)
+    with db_conn:
+        all_rows = db_conn.execute(execute_script)
+    return all_rows.fetchall()
 # --------------------------------------------------------------
 
 """ FUNCTIONS THAT RETURN A SINGLE FORMATTED RECIPE RECORD / INFO"""
