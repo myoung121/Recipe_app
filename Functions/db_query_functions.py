@@ -10,42 +10,65 @@ import  io
 """FUNCTIONS THAT RETURN RECIPE RECORD INFO"""
 
 
-def getFilteredRecipes(search_txt, db_connection_str:str, user_filter: str= 'name', return_all:bool=False):  # search box / toggle buttons
+def getFilteredRecipes(search_txt, db_connection_str:str, excluded_ingreds:tuple =(),user_filter: str= 'name', return_all:bool=False):  # search box / toggle buttons
     """can search by name, recipe_id, ingredient, instruction"""
-    column_names = ('Recipe.recipe_id', 'recipe_name', 'prep_time', 'cook_time')
     allowed_filters = ('name', 'recipe_id', 'ingredient', 'instruction')
+    blank_box = False # if user press enter with empty search box
     if user_filter in allowed_filters:
         db_connection_str = sqlite3.connect(db_connection_str)
-        execute_script = f'SELECT DISTINCT {",".join(column_names).rstrip(",")} ' \
-                         f'FROM Recipe '
+        execute_script = f'SELECT DISTINCT Recipe.recipe_id,recipe_name,prep_time,cook_time ' \
+                         f'FROM Recipe'
         if user_filter == allowed_filters[0]:  # name
-            if return_all:
-                pass
+            if return_all and excluded_ingreds:
+                blank_box = True
+                """execute_script += ' WHERE Recipe.recipe_id NOT IN ('
+                for ingred in excluded_ingreds:
+                    execute_script += f'SELECT RecipeIngredient.recipe_id ' \
+                                      'FROM RecipeIngredient ' \
+                                      'JOIN Ingredient ON RecipeIngredient.ingred_id=Ingredient.ingred_id ' \
+                                      f'WHERE Ingredient.ingred_name LIKE \'%{ingred}%\' UNION '
+                execute_script = execute_script.rstrip(' UNION ')
+                execute_script += ')'"""
+
             else:
                 search_txt = search_txt.replace(' ', '_')
-                execute_script += 'WHERE recipe_name ' \
+                execute_script += ' WHERE recipe_name ' \
                                   'LIKE '
                 placeholder = f'\'%{search_txt.lower()}%\''
                 execute_script += placeholder
         elif user_filter == allowed_filters[1]:  # recipe_id
-            execute_script += 'WHERE recipe_id ' \
+            execute_script += ' WHERE recipe_id ' \
                               'LIKE '
             placeholder = f'\'%{search_txt}%\''
             execute_script += placeholder
         elif user_filter == allowed_filters[2]:  # ingredients
-            execute_script += 'JOIN RecipeIngredient ON Recipe.recipe_id=RecipeIngredient.recipe_id ' \
+            execute_script += ' JOIN RecipeIngredient ON Recipe.recipe_id=RecipeIngredient.recipe_id ' \
                               'JOIN Ingredient ON RecipeIngredient.ingred_id=Ingredient.ingred_id ' \
                               'WHERE ingred_name ' \
                               'LIKE '
             placeholder = f'\'%{search_txt}%\''
             execute_script += placeholder
         elif user_filter == allowed_filters[3]:  # instructions
-            execute_script += 'WHERE instr ' \
+            execute_script += ' WHERE instr ' \
                               'LIKE '
             placeholder = f'\'%{search_txt}%\''
             execute_script += placeholder
     else:
         exit(f'{user_filter} Filter not Allowed')
+    if excluded_ingreds:
+        if blank_box: # excluded ingreds and empty search box
+            execute_script += ' WHERE Recipe.recipe_id NOT IN (' # expand query
+        if not blank_box: # have user input ingred
+            execute_script += ' AND Recipe.recipe_id NOT IN ('
+        for ingred in excluded_ingreds: # build subset to check recipe_ids against
+            execute_script += f'SELECT RecipeIngredient.recipe_id ' \
+                              'FROM RecipeIngredient ' \
+                              'JOIN Ingredient ON RecipeIngredient.ingred_id=Ingredient.ingred_id ' \
+                              f'WHERE Ingredient.ingred_name LIKE \'%{ingred}%\' UNION '
+        execute_script = execute_script.rstrip(' UNION ') # clean extra
+        execute_script += ')' # close for query
+
+    #print(execute_script)
     with db_connection_str:
         values = db_connection_str.execute(execute_script)
         values = values.fetchall()

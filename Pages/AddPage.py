@@ -81,10 +81,6 @@ class Add(
                     recipe_cooktime = entry_recipe_ck_time.get()  # get the cooktime (can be null)
                     recipe_comment = entry_recipe_notes.get('1.0', tk.END)[:-1].strip() # get the notes/ comment (can be null)
                     recipe_instrs = '. '.join(recipe_instrs) # change to string to store in database
-                    # REMEMBER TO SET FAVORITE TO TRUE HERE TOO
-                    #recipe_info = {'name':recipe_name,'ingred': recipe_ingreds, 'instrs':recipe_instrs,
-                    #               'cktime': recipe_cooktime, 'comment':recipe_comment, 'favorite':True}
-                    #pp.pprint(recipe_info)
                     try:
                         dFuncs.addRecipe(db_connection=db_conn_str,recipe_name=recipe_name,
                                      instructions=recipe_instrs, ingredients=recipe_ingreds,
