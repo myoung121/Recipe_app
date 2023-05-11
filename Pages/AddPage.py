@@ -23,7 +23,7 @@ class Add(
             if user_ingred: # if entry isnt blank
                 if len(user_ingred) < 100 and str(user_ingred):  # limit amount of data user can input
                     if str(user_ingred) not in l_box_ingreds.get(0, tk.END): # if ingredient not already added to onscreen list
-                        l_box_ingreds.insert(tk.END, str(user_ingred))  # add to listbox
+                        l_box_ingreds.insert(0, str(user_ingred))  # add to listbox
                         entry_recipe_ingred.delete(0, tk.END)  # clear entry text box
                     else:  # ingredient already in list
                         pass
@@ -45,7 +45,7 @@ class Add(
             if user_instrs: # if entry isnt blank
                 if len(user_instrs) <= 250:  # limit amount of data user can input
                     if str(user_instrs) not in l_box_instrs.get(0, tk.END): # instruction not already added
-                        l_box_instrs.insert(tk.END, str(user_instrs))  # add to listbox
+                        l_box_instrs.insert(0, str(user_instrs))  # add to listbox
                         entry_recipe_instrs.delete(0, tk.END)  # clear entry text box
                     else:  # instr already in list
                         pass

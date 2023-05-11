@@ -7,7 +7,8 @@ from Widgets import NavBar
 
 # todo- when opening a newly created recipe  throws error b/c it doesnt have an image. handle errors in the db func calls/ maybe could return a random image instead
 class Search(tk.Frame):
-    rows = []
+    rows = [] # current search results
+    banned_ingreds = [] # current banned ingredients
     user_last_search_str = ''  # users last searched words
     user_last_filter = 'name'  # users last filter applied
 
@@ -137,15 +138,49 @@ class Search(tk.Frame):
             except IndexError as e:  # if delete button pressed while curser isnt on a recipe
                 print(e)
                 pass
+
+
+        def addBanned(event):
+            """add ingredient to banned list"""
+            ingred_txt = entry_banned.get().lower().strip() # banned ingredient text box text
+            if ingred_txt: # if text isnt blank
+                if ingred_txt not in l_box_banned.get(0,tk.END): # if text not already in the box
+                    l_box_banned.insert(0,ingred_txt) # add text to the box
+            entry_banned.delete(0,tk.END)
+
+        def deleteBanned(event):
+            """delete ingredient from banned list"""
+            #selected_item = l_box_banned.curselection()
+            try:
+                l_box_banned.delete(l_box_banned.curselection()) # delete selected txt from box
+            except Exception: pass # if item isnt fully highlighted will raise a tkinter error, can ignore
         # --------------------------------------------------------------------------------------
 
         # FRAME
 
         NavBar.NavBar(self,controller,2,self.BG_COLOR,('help','add','home','quit'))  # navigation frame / buttons
 
+        # BANNED INGREDIENTS FRAME
+        frame_banned_ingreds = tk.LabelFrame(self,bg=self.BG_COLOR)
+        frame_banned_ingreds.grid(row=0,rowspan=3,column=0,padx=4)
 
-        frame_banned_ingreds = tk.Frame(self,bg=self.BG_COLOR)
-        frame_banned_ingreds.grid(row=1, column=0)
+        # banned ingredients label
+        lbl_banned_ingreds = tk.Label(frame_banned_ingreds,width=15,bg=self.BG_COLOR,fg='white',text='EXCLUDED')
+        lbl_banned_ingreds.grid(row=0,column=0)
+
+        entry_banned = tk.Entry(frame_banned_ingreds,width=15)
+        entry_banned.grid(row=1, column=0,pady=4)
+        entry_banned.bind('<Return>', addBanned)
+
+        l_box_banned = tk.Listbox(frame_banned_ingreds,width=15,height=4)
+        l_box_banned.grid(row=3,column=0,pady=4)
+        l_box_banned.bind('<Double-1>',deleteBanned) #double click deletes text from box
+        l_box_banned.bind('<Return>', deleteBanned) # enter deletes text from box
+
+        # move to left side of search bar
+        btn_delete = tk.Button(self, text='delete',bg=self.BG_COLOR,fg='white',command=deleteRecipe)  # deletes recipe from database
+        btn_delete.grid(row=2, column=0,padx=5)
+
 
         frame_search_pic = tk.Frame(self,bg=self.BG_COLOR)
         frame_search_pic.grid(row=1, column=1, columnspan=2,)
@@ -164,8 +199,7 @@ class Search(tk.Frame):
 
 
         # BUTTONS
-        btn_banned = tk.Button(frame_banned_ingreds, text='-',bg=self.BG_COLOR,fg='white')
-        btn_banned.grid(row=0, column=1)
+
 
         btn_go = tk.Button(frame_side_btns, text='go', bg=self.BG_COLOR,fg='white',command=lambda: recipeSelect(event=None))
         btn_go.grid(row=0, column=0)
@@ -176,15 +210,11 @@ class Search(tk.Frame):
 
         btn_entry = tk.Button(frame_entry_w_btn, text='enter',bg=self.BG_COLOR,fg='white',command=search)
         btn_entry.grid(row=0, column=1)
-        # confirm before deleting
-        btn_delete = tk.Button(self, text='delete',bg=self.BG_COLOR,fg='white',command=deleteRecipe)  # deletes recipe from database
-        btn_delete.grid(row=2, column=0)
+
 
         # LABEL
-        lbl_banned = tk.Label(frame_banned_ingreds,
-                              text=f'{"*" * 10}\nbanned\ningrdients\ngo\nhere\n^\n|\n{"*" * 10}',padx=5)
-        lbl_banned.grid(row=1, column=1, columnspan=2)
-        lbl_pic = tk.Label(frame_search_pic, image=self.image,padx=5)
+
+        lbl_pic = tk.Label(frame_search_pic, image=self.image,padx=5,bg=self.BG_COLOR)
         lbl_pic.grid(row=0, column=1)
 
         lbl_image_name = tk.Label(frame_search_pic,bg=self.BG_COLOR,fg='white',text=self.image_name,
@@ -196,13 +226,13 @@ class Search(tk.Frame):
 
         # LISTBOX
         l_box_search = tk.Listbox(frame_search_pic,width=50)
-        l_box_search.grid(row=0, column=0)
+        l_box_search.grid(row=0, column=0,padx=2)
         # Bind selection function to the listbox
         l_box_search.bind('<Double-1>', recipeSelect)
         l_box_search.bind('<Return>', recipeSelect)
 
         # ENTRY
-        entry_search_text = tk.Entry(frame_entry_w_btn)  # needs to be a text box
+        entry_search_text = tk.Entry(frame_entry_w_btn)
         entry_search_text.grid(row=0, column=0, pady=0)
         entry_search_text.bind('<Return>', search)
 
