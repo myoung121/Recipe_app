@@ -153,7 +153,7 @@ class Search(tk.Frame):
         # BANNED INGREDIENTS FRAME WIDGETS
         frame_banned_ingreds = tk.LabelFrame(self,bg=self.BG_COLOR) # MAIN FRAME
         frame_banned_ingreds.grid(row=0,rowspan=3,column=0,padx=4)
-        lbl_banned_ingreds = tk.Label(frame_banned_ingreds,width=15,bg=self.BG_COLOR,fg='white',text='EXCLUDED') # TET ABOVE BANNED ENTRY WIDGET
+        lbl_banned_ingreds = tk.Label(frame_banned_ingreds,width=15,bg=self.BG_COLOR,fg='white',text='Excluded') # TET ABOVE BANNED ENTRY WIDGET
         lbl_banned_ingreds.grid(row=0,column=0)
         entry_banned = tk.Entry(frame_banned_ingreds,width=15) # TEXT ENTRY
         entry_banned.grid(row=1, column=0,pady=4)
@@ -180,47 +180,47 @@ class Search(tk.Frame):
         frame_toggles = tk.Frame(self,bg=self.BG_COLOR) # MAIN FRAME
         frame_toggles.grid(row=2, column=1,pady=4)
         recipe_toggle = tk.IntVar()  # tracks if toggle is selected
-        chk_bx_recipe_id = tk.Checkbutton(frame_toggles, text='recipe_id',
+        chk_bx_recipe_id = tk.Checkbutton(frame_toggles, text='Recipe #',
                                        variable=recipe_toggle, bg=self.BG_COLOR, fg='white',
                                        command=lambda: checkBoxControl(chk_bx_recipe_id)) # FILTER RECIPES BY RECIPE ID
         chk_bx_recipe_id.grid(row=0, column=1, padx=5)
         title_toggle = tk.IntVar()  # tracks if toggle is selected
-        chk_bx_name = tk.Checkbutton(frame_toggles, text='name',
+        chk_bx_name = tk.Checkbutton(frame_toggles, text='Name',
                                       variable=title_toggle, bg=self.BG_COLOR, fg='white',
                                       command=lambda: checkBoxControl(chk_bx_name)) # FILTER RECIPES BY RECIPE NAME
         chk_bx_name.grid(row=0, column=0, padx=5)
         chk_bx_name.select()  # this box is selected by default
         ingred_toggle = tk.IntVar()  # tracks if toggle is selected
-        chk_bx_ingred = tk.Checkbutton(frame_toggles, text='ingredient',
+        chk_bx_ingred = tk.Checkbutton(frame_toggles, text='Ingredients',
                                        variable=ingred_toggle, bg=self.BG_COLOR, fg='white',
                                        command=lambda: checkBoxControl(chk_bx_ingred)) # FILTER RECIPES BY INGREDIENT
         chk_bx_ingred.grid(row=0, column=2, padx=5)
         instrs_toggle = tk.IntVar()  # tracks if toggle is selected
-        chk_bx_instrs = tk.Checkbutton(frame_toggles, text='instruction', bg=self.BG_COLOR, fg='white',
+        chk_bx_instrs = tk.Checkbutton(frame_toggles, text='Steps', bg=self.BG_COLOR, fg='white',
                                        variable=instrs_toggle, command=lambda: checkBoxControl(chk_bx_instrs)) # FILTER RECIPES BY INSTRUCTION
         chk_bx_instrs.grid(row=0, column=3, padx=5)
 
         # SEARCH BAR FRAME
         frame_entry_w_btn = tk.Frame(self,bg=self.BG_COLOR) # MAIN FRAME
         frame_entry_w_btn.grid(row=3, column=1,pady=4)
-        btn_delete = tk.Button(frame_entry_w_btn, text='delete',bg=self.BG_COLOR,fg='white',command=deleteRecipe)  # deletes recipe from database
+        btn_delete = tk.Button(frame_entry_w_btn, text='Delete',bg=self.BG_COLOR,fg='white',command=deleteRecipe)  # deletes recipe from database
         btn_delete.grid(row=0, column=0,padx=4)
         entry_search_text = tk.Entry(frame_entry_w_btn) # USER ENTRY TEXT BOX
         entry_search_text.grid(row=0, column=1, padx=4)
         entry_search_text.bind('<Return>', search) # PRESS ENTER TO SEARCH DATABASE BY KEYWORD
-        btn_entry = tk.Button(frame_entry_w_btn, text='enter',bg=self.BG_COLOR,fg='white',command=search) # SEARCH DATABASE BY KEYWORD
+        btn_entry = tk.Button(frame_entry_w_btn, text='Enter',bg=self.BG_COLOR,fg='white',command=search) # SEARCH DATABASE BY KEYWORD
         btn_entry.grid(row=0, column=2,padx=4)
 
         # ACTION BUTTONS FRAME
         frame_side_btns = tk.Frame(self,bg=self.BG_COLOR) # MAIN FRAME
         frame_side_btns.grid(row=3, column=2)
-        btn_go = tk.Button(frame_side_btns, text='go', bg=self.BG_COLOR,fg='white',
+        btn_go = tk.Button(frame_side_btns, text='Go', bg=self.BG_COLOR,fg='white',
                            command=lambda: recipeSelect(event=None)) # OPEN SELECTED RECIPE
         btn_go.grid(row=0, column=0,padx=3)
-        btn_random = tk.Button(frame_side_btns, text='random',bg=self.BG_COLOR,fg='white',
+        btn_random = tk.Button(frame_side_btns, text='Random',bg=self.BG_COLOR,fg='white',
                                command=randomRecipe) # OPEN A RANDOM RECIPE FROM ENTIRE DATABASE
         btn_random.grid(row=0, column=1,padx=3)
-        btn_favorites = tk.Button(frame_side_btns,text='favs',bg=self.BG_COLOR,fg='white',
+        btn_favorites = tk.Button(frame_side_btns,text='Favs',bg=self.BG_COLOR,fg='white',
                                   command=getFavs) # DISPLAYS FAVORITE RECIPES
         btn_favorites.grid(row=0,column=2,padx=3)
 
