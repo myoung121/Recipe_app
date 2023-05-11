@@ -160,11 +160,10 @@ class Search(tk.Frame):
 
         NavBar.NavBar(self,controller,2,self.BG_COLOR,('help','add','home','quit'))  # navigation frame / buttons
 
-        # BANNED INGREDIENTS FRAME
+        # BANNED INGREDIENTS FRAME WIDGETS
         frame_banned_ingreds = tk.LabelFrame(self,bg=self.BG_COLOR)
         frame_banned_ingreds.grid(row=0,rowspan=3,column=0,padx=4)
 
-        # banned ingredients label
         lbl_banned_ingreds = tk.Label(frame_banned_ingreds,width=15,bg=self.BG_COLOR,fg='white',text='EXCLUDED')
         lbl_banned_ingreds.grid(row=0,column=0)
 
@@ -177,7 +176,6 @@ class Search(tk.Frame):
         l_box_banned.bind('<Double-1>',deleteBanned) #double click deletes text from box
         l_box_banned.bind('<Return>', deleteBanned) # enter deletes text from box
 
-        # move to left side of search bar
         btn_delete = tk.Button(self, text='delete',bg=self.BG_COLOR,fg='white',command=deleteRecipe)  # deletes recipe from database
         btn_delete.grid(row=2, column=0,padx=5)
 
@@ -237,25 +235,39 @@ class Search(tk.Frame):
         entry_search_text.bind('<Return>', search)
 
         # CHECKBOX
-        recipe_toggle = tk.IntVar()
+
+        CHECK_BOX_NAMES = tuple('recipe# name ingredient instruction'.split(' '))
+        chk_boxes = {} # stores all check boxes
+        for num,chk in enumerate(CHECK_BOX_NAMES):
+            toggle_pair = [] # store chk_box obj, and variable used to track
+            toggle_var = tk.IntVar() # tracks if check box is selected
+            chk_bx = tk.Checkbutton(frame_toggles, text=chk,
+                                      variable=toggle_var, bg=self.BG_COLOR,fg='white',command=lambda: checkBoxControl(chk_bx))
+            toggle_pair.append(chk_bx) # save checkbox object
+            toggle_pair.append(toggle_var) # save tracker variable
+            chk_boxes[chk] = toggle_pair # add to main group
+            chk_boxes[chk][0].grid(row=0,column=num) # push checkbox to the screen to screen
+
+
+        """recipe_toggle = tk.IntVar() # tracks if toggle is selected
         chk_bx_recipe = tk.Checkbutton(frame_toggles, text='recipe_id',
                                        variable=recipe_toggle, bg=self.BG_COLOR,fg='white',command=lambda: checkBoxControl(chk_bx_recipe))
         chk_bx_recipe.grid(row=0, column=1, padx=5)
 
-        title_toggle = tk.IntVar()
+        title_toggle = tk.IntVar() # tracks if toggle is selected
         chk_bx_title = tk.Checkbutton(frame_toggles, text='name',
                                       variable=title_toggle, bg=self.BG_COLOR,fg='white',command=lambda: checkBoxControl(chk_bx_title))
         chk_bx_title.grid(row=0, column=0, padx=5)
         chk_bx_title.select()  # this box is selected by default
 
-        ingred_toggle = tk.IntVar()
+        ingred_toggle = tk.IntVar() # tracks if toggle is selected
         chk_bx_ingred = tk.Checkbutton(frame_toggles, text='ingredient',
                                        variable=ingred_toggle, bg=self.BG_COLOR,fg='white',command=lambda: checkBoxControl(chk_bx_ingred))
         chk_bx_ingred.grid(row=0, column=2, padx=5)
 
-        instrs_toggle = tk.IntVar()
+        instrs_toggle = tk.IntVar() # tracks if toggle is selected
         chk_bx_instrs = tk.Checkbutton(frame_toggles, text='instruction',bg=self.BG_COLOR,fg='white',
                                        variable=instrs_toggle, command=lambda: checkBoxControl(chk_bx_instrs))
-        chk_bx_instrs.grid(row=0, column=3, padx=5)
+        chk_bx_instrs.grid(row=0, column=3, padx=5)"""
 
         search()  # loads all recipes into  search box

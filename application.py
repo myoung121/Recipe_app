@@ -13,7 +13,7 @@ DB_STR = './food_stuff_tester.db'
 WINDOW_WIDTH = 830
 WINDOW_HEIGHT = 300
 WINDOW_SIZE = f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}'
-BG_COLOR = '#0b0854'
+BG_COLOR = '#242c3f'
 # track how many windows open
 MAX_OPEN_RECIPES = 5
 # this tracks open recipe windows by name as key and image as value(images had to be avail in this file)
