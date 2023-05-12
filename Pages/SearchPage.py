@@ -16,6 +16,7 @@ class Search(tk.Frame):
         self.config(bg=self.BG_COLOR) # set page to color
         DB_STR = page_info['db_str'] # recipe database location
         MAX_PAGES = page_info['max_pages'] # number of pages that can be open at one time
+        RECIPE_PAGE = page_info['recipe_page'] # recipe page object
         open_recipe_windows = page_info['open_pages'] # track recipes pages opened
         image_info = db_query_functions.getImageRandom(DB_STR)[0] # random image to display
         self.image_name = image_info[0].replace('_',' ') # clean image name / set to page
@@ -84,9 +85,9 @@ class Search(tk.Frame):
             try:
                 selected_recipe = db_query_functions.getRecipeInfo(recipe_id=rows[selected_item[0]][0],
                                                                    db_connection_str=DB_STR) # gather the recipe information / returns tuple (recipe_info-dict,image-bytes)
-                open_recipe_page = checkPages(selected_recipe[0]['name'], open_recipe_windows,MAX_PAGES)  # check if allowed to open a new window
-                if open_recipe_page:  # can show recipe
-                    recipe_page = page_info['recipe_page'](selected_recipe[0], selected_recipe[1]) # new recipe page
+                check_passed = checkPages(selected_recipe[0]['name'], open_recipe_windows,MAX_PAGES)  # check if allowed to open a new window
+                if check_passed:  # can show recipe
+                    recipe_page = RECIPE_PAGE(selected_recipe[0], selected_recipe[1],open_recipe_windows,DB_STR) # new recipe page
                     open_recipe_windows.append(recipe_page.recipe_name) #add open window to tracker / tracks if recipe already op and how many are open
                     print(f'opened #{recipe_page.recipe_id}-{recipe_page.recipe_name} <-')
             except IndexError:  # if go button pressed while curser isnt on a recipe
@@ -95,10 +96,10 @@ class Search(tk.Frame):
         def randomRecipe():
             """opens a window with a random recipe"""
             selected_item = db_query_functions.getRecipeInfoRandom(db_connection_str=DB_STR) # get a random recipe
-            open_recipe_page = checkPages(selected_item[0]['name'], page_info['open_pages'],
-                                          page_info['max_pages'])  # check if allowed to open a new window
-            if open_recipe_page:  # can show recipe
-                recipe_page = page_info['recipe_page'](selected_item[0], selected_item[1]) # make recipe window
+            check_passed = checkPages(selected_item[0]['name'],open_recipe_windows,
+                                          MAX_PAGES)  # check if allowed to open a new window
+            if check_passed:  # can show recipe
+                recipe_page = RECIPE_PAGE(selected_item[0], selected_item[1],open_recipe_windows,DB_STR) # make recipe window
                 open_recipe_windows.append(recipe_page.recipe_name) # add to tracker
                 print(f'opened {recipe_page.recipe_id}-{recipe_page.recipe_name} <-')
 
@@ -168,7 +169,7 @@ class Search(tk.Frame):
         frame_search_pic.grid(row=1, column=1, columnspan=2,)
         lbl_image = tk.Label(frame_search_pic, image=self.image, padx=5, bg=self.BG_COLOR) # DISPLAYS THE IMAGE
         lbl_image.grid(row=0, column=1)
-        lbl_image_name = tk.Label(frame_search_pic, bg=self.BG_COLOR, fg='white', text=self.image_name,
+        lbl_image_name = tk.Label(frame_search_pic, bg=self.BG_COLOR, fg='white', text=self.image_name[:25],
                                   font=('Times New Roman', 10)) # IMAGE NAME TEXT
         lbl_image_name.grid(row=0, column=1, sticky='se')
         l_box_search = tk.Listbox(frame_search_pic, width=50) # DISPLYS SEARCH RESULTS

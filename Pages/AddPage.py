@@ -1,5 +1,5 @@
 """ADD RECIPE PAGE"""
-
+import tkinter
 import tkinter as tk
 from tkinter import scrolledtext
 from Widgets import NavBar
@@ -85,6 +85,11 @@ class Add(
                         dFuncs.addRecipe(db_connection=db_conn_str,recipe_name=recipe_name,
                                      instructions=recipe_instrs, ingredients=recipe_ingreds,
                                      cook_time_minutes=recipe_cooktime,comment=recipe_comment)# add recipe to database
+                        # CLEAR ALL ENTRIES ON PAGE
+                        resets = (entry_recipe_name,entry_recipe_ck_time,entry_recipe_notes,
+                        l_box_instrs,l_box_ingreds) # widgets
+                        for widget in resets:
+                            widget.delete(0,tk.END)
                     except Exception as e:
                         print(e)
                 else: # show pop-up for empty required fields
@@ -138,7 +143,7 @@ class Add(
         entry_recipe_notes.grid(row=3, column=0, pady=1)
 
         # BUTTON
-        btn_save = tk.Button(self, text='save', bg=self.BG_COLOR,fg='white',command=addRecipe) # add recipe to database
+        btn_save = tk.Button(self, text='Save', bg=self.BG_COLOR,fg='white',command=addRecipe) # add recipe to database
         btn_save.grid(row=0, column=0)
         btn_minus_ingred = tk.Button(frame_display_left, text='X', bg=self.BG_COLOR,fg='white',command=deleteIngred) # delete ingredient from display
         btn_minus_ingred.grid(row=1, column=1)

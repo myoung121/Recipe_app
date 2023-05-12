@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 
 import application as app
-from Pages import ScrollBox as sBox
+from Widgets import ScrollBox as sBox
 
 """
 should open in sep. window
