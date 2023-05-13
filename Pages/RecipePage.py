@@ -76,13 +76,13 @@ class Recipe(tk.Toplevel):
 
         def saveComment():
             """save comment to database while comment box is active"""
-            comment_box_state = recipe_note.cget('state') # get comment box state
-            if comment_box_state == 'normal': # only save comment in edit mode
+            if recipe_note.cget('state') == 'normal': # get comment box state and only save comment in edit mode
                 notes =recipe_note.get('1.0',tk.END)[:-1].strip() # get all comments
                 if notes: # if comment not blank
                     dbFuncs.addComment(self.recipe_id,self.db_conn,notes) # add comment to recipe in database
                 else: # comment box is blank
                     pass
+                recipe_note.config(state='disabled')
         #-----------------------------------------------------------------
         # CLOSE WINDOW WIDGETS
         frame_close = tk.Frame(self,bg=self.color) # close button frame

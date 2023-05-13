@@ -2,76 +2,47 @@
 # skeleton from: https://www.geeksforgeeks.org/creating-tabbed-widget-with-python-tkinter/
 import tkinter as tk
 from tkinter import ttk
-
-import application as app
 from Widgets import ScrollBox as sBox
 
 """
-should open in sep. window
-only one can be open
-tabs should have scroll boxes
-make close button
-    move tabs down a row
+Explains how to use the application
 """
 
 
 class Help(tk.Toplevel):
-
-    def __init__(self):
+    TABS_GREETING = 'INFO:'
+    def __init__(self,bg_colr):
         # nav dict needs:
         super().__init__()
-        self.title('Help / Info')
-        # set size
-        self.geometry('400x300')
-        db_str = app.test_db_str
-        # make parent widget for tabs
-        tab_parent = ttk.Notebook(self)
+        self.title('Help')
+        self.BG_COLOR = bg_colr
+        self.geometry('400x300')# set size
 
-        # make tab frames
-        tab_labels = {'home':ttk.LabelFrame(tab_parent),
-                'search':ttk.LabelFrame(tab_parent),
-                'add':ttk.LabelFrame(tab_parent),
-                'recipe':ttk.LabelFrame(tab_parent),
-                'app_info':ttk.LabelFrame(tab_parent),
-                'logs':ttk.LabelFrame(tab_parent)
-                }
+
+        tab_parent = ttk.Notebook(self)# parent widget for tabs
+
+        tab_labels = {'home':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING),
+                'search':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING),
+                'add':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING),
+                'recipe':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING),
+                'app_info':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING),
+                'logs':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING)
+                } # make tab frames
 
         # ADD INFO
         all_tabs = {
-                    'home_info':sBox.ScrollTextBox(tab_labels['home'],'home info here'.split(),
-                                                 numbered=False,with_canvas=True,db_connection_str=db_str),
-                    'search_info':sBox.ScrollTextBox(tab_labels['search'], 'search info here'.split(),
-                                                   numbered=False,with_canvas=True,db_connection_str=db_str),
-                    'add_info':sBox.ScrollTextBox(tab_labels['add'], 'add info here'.split(),
-                                                numbered=False,with_canvas=True,db_connection_str=db_str),
-                    'recipe_info':sBox.ScrollTextBox(tab_labels['recipe'], 'recipe info here'.split(),
-                                                   numbered=False,with_canvas=True,db_connection_str=db_str),
-                    'app_info_info':sBox.ScrollTextBox(tab_labels['app_info'], 'app_info info here'.split(),
-                                                     numbered=False,with_canvas=True,db_connection_str=db_str),
-                    'logs_info':sBox.ScrollTextBox(tab_labels['logs'], 'logs info here'.split(),
-                                                 numbered=False,with_canvas=True,db_connection_str=db_str)
+                    'home_info':sBox.ScrollTextBox(tab_labels['home'],'home info here'.split(),self.BG_COLOR,numbered=False),
+                    'search_info':sBox.ScrollTextBox(tab_labels['search'], 'search info here'.split(),self.BG_COLOR,numbered=False),
+                    'add_info':sBox.ScrollTextBox(tab_labels['add'], 'add info here'.split(),self.BG_COLOR,numbered=False),
+                    'recipe_info':sBox.ScrollTextBox(tab_labels['recipe'], 'recipe info here'.split(),self.BG_COLOR,numbered=False),
+                    'app_info_info':sBox.ScrollTextBox(tab_labels['app_info'], 'app_info info here'.split(),self.BG_COLOR,numbered=False),
+                    'logs_info':sBox.ScrollTextBox(tab_labels['logs'], 'logs info here'.split(),self.BG_COLOR,numbered=False)
                     }
 
-        # export canvas images to main app
-        #for tab_name,box in all_tabs.items():
-        #    app.help_canvas[tab_name] = box.getImage()
-        # add tabs to notebook object
-        for t in tab_labels.keys():
+
+        for t in tab_labels.keys():# add tabs to notebook object
             tab_parent.add(tab_labels[t],text=t)
 
-        # add parent widget to window
-        tab_parent.pack(expand=1,fill='both')
-"""
-home_info=sBox.ScrollTextBox(tabs['home'],'home info here'.split(),
-                                     numbered=False,with_canvas=True,db_connection_str=db_str)
-        search_info=sBox.ScrollTextBox(tabs['search'], 'search info here'.split(),
-                                       numbered=False,with_canvas=True,db_connection_str=db_str)
-        add_info=sBox.ScrollTextBox(tabs['add'], 'add info here'.split(),
-                                    numbered=False,with_canvas=True,db_connection_str=db_str)
-        recipe_info=sBox.ScrollTextBox(tabs['recipe'], 'recipe info here'.split(),
-                                       numbered=False,with_canvas=True,db_connection_str=db_str)
-        app_info_info=sBox.ScrollTextBox(tabs['app_info'], 'app_info info here'.split(),
-                                         numbered=False,with_canvas=True,db_connection_str=db_str)
-        logs_info=sBox.ScrollTextBox(tabs['logs'], 'logs info here'.split(),
-                                     numbered=False,with_canvas=True,db_connection_str=db_str)
-"""
+
+        tab_parent.pack(expand=1,fill='both')# add parent widget to window
+

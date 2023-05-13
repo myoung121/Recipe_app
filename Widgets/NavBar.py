@@ -33,7 +33,7 @@ class NavBar(tk.Frame):
             elif button == 'help':
                 # HELP
                 btn_help = tk.Button(frame_navigation, text='HELP', bg=bg_color, fg='white', border=False,
-                                     command=lambda: HelpPage.Help())  # open help / info pop-up
+                                     command=lambda: HelpPage.Help(bg_color))  # open help / info pop-up
                 btn_help.grid(row=0, column=num, padx=0)
             elif button == 'quit':
                 # QUIT

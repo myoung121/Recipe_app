@@ -5,7 +5,6 @@ from tkinter import scrolledtext
 from Widgets import NavBar
 from Functions import db_query_functions as dFuncs
 
-# todo - make pop ups or move on to Search Page
 
 class Add(
     tk.Frame):

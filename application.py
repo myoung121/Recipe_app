@@ -1,9 +1,6 @@
 import logging
 import tkinter as tk
-from tkinter import messagebox, scrolledtext
-from PIL import Image, ImageTk
-from Pages import HomePage,SearchPage, AddPage, HelpPage, RecipePage
-import pprint as pp
+from Pages import HomePage,SearchPage, AddPage, RecipePage
 
 
 log = logging.getLogger(__name__)
@@ -58,7 +55,7 @@ class MyApp:
                 home_nav = {'bg_color':BG_COLOR,'db_str':DB_STR,'win_size':WINDOW_SIZE}
                 search_nav = {'bg_color':BG_COLOR,'recipe_page':RecipePage.Recipe,'db_str':test_db_str,'open_pages':open_recipes,
                               'max_pages':MAX_OPEN_RECIPES}
-                add_nav = {'bg_color':BG_COLOR,'win_size':WINDOW_SIZE,'db_conn':DB_STR,'help':HelpPage.Help,'home':HomePage.Home,'search':SearchPage.Search}
+                add_nav = {'bg_color':BG_COLOR,'win_size':WINDOW_SIZE,'db_conn':DB_STR}
                 self.frames = self.makeFrames((HomePage.Home, SearchPage.Search, AddPage.Add),
                                               (home_nav,search_nav,add_nav),parent=container)
 
