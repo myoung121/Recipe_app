@@ -60,7 +60,7 @@ class MyApp:
                                               (home_nav,search_nav,add_nav),parent=container)
 
                 # start on the home page
-                self.show_frame(SearchPage.Search)
+                self.show_frame(HomePage.Home)
                 self.title('COOKBOOK')
 
             # to display the current frame passed as parameter

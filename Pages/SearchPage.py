@@ -46,7 +46,7 @@ class Search(tk.Frame):
             global rows
             l_box_search.delete(0, tk.END) # clear the search display box
             if not entry_search_text.get():  # if user pressed enter with no entry text
-                checkBoxControl(chk_bx_name)  # set default search field to recipe name
+                checkBoxControl(chk_bx_recipe_id)  # set default search field to recipe id number
                 rows = db_query_functions.getFilteredRecipes(search_txt='', db_connection_str=DB_STR,
                                                              user_filter=checkBoxStatus(),
                                                              return_all=True,  # return all recipes
@@ -191,7 +191,6 @@ class Search(tk.Frame):
                                       variable=title_toggle, bg=self.BG_COLOR, fg='white',
                                       command=lambda: checkBoxControl(chk_bx_name)) # FILTER RECIPES BY RECIPE NAME
         chk_bx_name.grid(row=0, column=0, padx=5)
-        chk_bx_name.select()  # this box is selected by default
         ingred_toggle = tk.IntVar()  # tracks if toggle is selected
         chk_bx_ingred = tk.Checkbutton(frame_toggles, text='Ingredients',
                                        variable=ingred_toggle, bg=self.BG_COLOR, fg='white',

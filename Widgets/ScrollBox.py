@@ -7,7 +7,7 @@ class ScrollTextBox(tk.Frame):
 
     # constructor
     def __init__(self,parent_frame:tk.LabelFrame,text_iter,bg_color,
-                 numbered=True,t_box_height_max = 15,t_box_width_max = 50):
+                 numbered=True,set_bg_color=False,t_box_height_max = 15,t_box_width_max = 50):
         # t_box_height_max is the max number of lines to show
         # t_box_width_max is the max number of letters to show
         super().__init__()
@@ -22,13 +22,19 @@ class ScrollTextBox(tk.Frame):
         text_box_info = tk.Text(parent_frame, width=self.t_box_width, height=self.t_box_height, wrap=tk.NONE,
                  xscrollcommand=s_bar_hor.set,
                  yscrollcommand=s_bar_vert.set) # create a Text widget and attach scrollbars
-
-        for num,text in enumerate(text_iter): # insert the text
-            if numbered: # show line numbers with text
-                text_str = f'{num+1}) {text}\n'
-            else:
-                text_str = f'{text}\n' # show just the text
-            text_box_info.insert(tk.END, text_str)
+        if set_bg_color: # set a background color
+            text_box_info.config(bg=self.BG_COLOR,fg='white')
+        print(f'text in scroll box build\n{text_iter}')
+        # this widget is used for list and strings so have to check for that condition
+        if isinstance(text_iter,(list,tuple)):
+            for num,text in enumerate(text_iter): # insert the text
+                if numbered: # show line numbers with text
+                    text_str = f'{num+1}) {text}\n'
+                else:
+                    text_str = f'{text}\n' # show just the text
+                text_box_info.insert(tk.END, text_str)
+        else: # if input is a string
+            text_box_info.insert('1.0',text_iter)
         text_box_info.configure(state='disabled')# make text widget read only
         text_box_info.pack(side=tk.TOP, fill=tk.X)
         s_bar_hor.config(command=text_box_info.xview) # set scrollbar horizontal movement

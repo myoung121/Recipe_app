@@ -3,7 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 from Widgets import ScrollBox as sBox
-
+from Pages import HelpPage_text as hTxt
 """
 Explains how to use the application
 """
@@ -16,8 +16,8 @@ class Help(tk.Toplevel):
         super().__init__()
         self.title('Help')
         self.BG_COLOR = bg_colr
-        self.geometry('400x300')# set size
-
+        self.geometry('600x300')# set size
+        self.resizable(width=False, height=False)  # lock window size
 
         tab_parent = ttk.Notebook(self)# parent widget for tabs
 
@@ -28,15 +28,15 @@ class Help(tk.Toplevel):
                 'app_info':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING),
                 'logs':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING)
                 } # make tab frames
-
+        print(f'home page txt = {hTxt.getHomeTxt()}')
         # ADD INFO
         all_tabs = {
-                    'home_info':sBox.ScrollTextBox(tab_labels['home'],'home info here'.split(),self.BG_COLOR,numbered=False),
-                    'search_info':sBox.ScrollTextBox(tab_labels['search'], 'search info here'.split(),self.BG_COLOR,numbered=False),
-                    'add_info':sBox.ScrollTextBox(tab_labels['add'], 'add info here'.split(),self.BG_COLOR,numbered=False),
-                    'recipe_info':sBox.ScrollTextBox(tab_labels['recipe'], 'recipe info here'.split(),self.BG_COLOR,numbered=False),
-                    'app_info_info':sBox.ScrollTextBox(tab_labels['app_info'], 'app_info info here'.split(),self.BG_COLOR,numbered=False),
-                    'logs_info':sBox.ScrollTextBox(tab_labels['logs'], 'logs info here'.split(),self.BG_COLOR,numbered=False)
+                    'home_info':sBox.ScrollTextBox(tab_labels['home'],hTxt.getHomeTxt(),self.BG_COLOR,numbered=False,set_bg_color=True),
+                    'search_info':sBox.ScrollTextBox(tab_labels['search'], hTxt.getSearchTxt(),self.BG_COLOR,numbered=False,set_bg_color=True),
+                    'add_info':sBox.ScrollTextBox(tab_labels['add'], 'add info here'.split(),self.BG_COLOR,numbered=False,set_bg_color=True),
+                    'recipe_info':sBox.ScrollTextBox(tab_labels['recipe'], 'recipe info here'.split(),self.BG_COLOR,numbered=False,set_bg_color=True),
+                    'app_info_info':sBox.ScrollTextBox(tab_labels['app_info'], 'app_info info here'.split(),self.BG_COLOR,numbered=False,set_bg_color=True),
+                    'logs_info':sBox.ScrollTextBox(tab_labels['logs'], 'logs info here'.split(),self.BG_COLOR,numbered=False,set_bg_color=True)
                     }
 
 
