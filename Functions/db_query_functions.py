@@ -113,10 +113,6 @@ def getImageRandom(db_connection_str:str,num_of_images:int=1,screen_sized=False,
         pic = Image.open(io.BytesIO(image_pair[1]))
         sub_list.append(ImageTk.PhotoImage(pic))
         random_jpeg_images.append(tuple(sub_list))
-    print('Images: ',end='')
-    for j in random_jpeg_images:
-        print(j[0],end='/ ')
-    print()
     return random_jpeg_images
 
 def getFavorites(db_connection_str):
@@ -376,9 +372,10 @@ def addComment(recipe_id:int,db_connection,comment:str)->None:
     execute_script = 'UPDATE Recipe ' \
                      'SET comment=? ' \
                      'WHERE recipe_id=?'
+    db_connection = sqlite3.connect(db_connection)
     with db_connection:
         db_connection.execute(execute_script,(str(comment),recipe_id))
-    print('row updated')
+    print('+comment updated+')
 
 def removeComment(recipe_id:int,db_connection)->None:
     # todo- should auto update the updated_at column
@@ -392,7 +389,6 @@ def toggleFav(recipe_id:int,db_connection)-> None:
     with db_connection:
         current_fav_value = db_connection.execute(execute_script)
     current_fav_value = current_fav_value.fetchall()[0][0]
-    print(f'#{recipe_id} - current fav value is {current_fav_value}')
     if current_fav_value:
         new_fav_value = False
     else:
@@ -402,10 +398,10 @@ def toggleFav(recipe_id:int,db_connection)-> None:
                      f'WHERE recipe_id = {recipe_id}'
     with db_connection:
         db_connection.execute(execute_script)
-    if new_fav_value:
+    """if new_fav_value:
         print('recipe favorited')
     else:
-        print('recipe un-favorited')
+        print('recipe un-favorited')"""
 
 """FUNCTIONS THAT RETURN TABLE INFO / CHECK COLUMN,TABLE INFO"""
 def getMaxIdNum(db_connection,column:str,table:str):
@@ -428,7 +424,7 @@ def validRecipeName(db_connection,recipe_name):
         return True
 
 def isUniqueIngred(db_connection, ingredient):
-    """returns True,None if ingredient isnt in database, returns False,ingred_id if it is"""
+    """returns (True,None) if ingredient isnt in database, returns (False,ingred_id) if it is"""
     execute_script = f'SELECT ingred_id FROM Ingredient WHERE ingred_name LIKE ?' # make the query
     placeholder = ''
     execute_script += placeholder

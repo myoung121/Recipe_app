@@ -105,9 +105,10 @@ class Search(tk.Frame):
 
         def getFavs():
             """returns recipes that are favorited"""
-            favs = db_query_functions.getFavorites(DB_STR) # get favorite recipes from database
+            global rows
+            rows = db_query_functions.getFavorites(DB_STR) # get favorite recipes from database
             l_box_search.delete(0, tk.END) # clear the displayed recipes
-            for item in favs:
+            for item in rows:
                 item = list(item) # change type to edit elements
                 item[1]=item[1].replace('_',' ')
                 l_box_search.insert(tk.END, f'{item[0]}. {item[1].title()}') # add recipe info to display
