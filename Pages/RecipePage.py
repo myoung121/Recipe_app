@@ -126,13 +126,13 @@ class Recipe(tk.Toplevel):
         frame_ingreds = tk.LabelFrame(frame_ingreds_instrs,text='Ingredients', bg=self.color,fg=self.text_color,
                                       borderwidth=0,font=self.LABEL_TEXT_FONT) # recipe ingredients frame
         frame_ingreds.grid(row=0,column=0,sticky='n',pady=20)
-        scroll_text_ingreds= sBox.ScrollTextBox(frame_ingreds,self.recipe_ingreds) # ingredients are listed in a scrollbox
+        scroll_text_ingreds= sBox.ScrollTextBox(frame_ingreds,self.recipe_ingreds,self.color) # ingredients are listed in a scrollbox
         lbl_blank = tk.Label(frame_ingreds_instrs,bg=self.color) # empty spacer between ingredients and instructions scroll tboxes
         lbl_blank.grid(row=1, column=0, pady=5)
         frame_instrs = tk.LabelFrame(frame_ingreds_instrs,text='Instructions',bg=self.color,fg=self.text_color,
                                       borderwidth=0,font=self.LABEL_TEXT_FONT) # recipe instructions frame
         frame_instrs.grid(row=1,column=0,sticky='s',pady=25)
-        scroll_text_istrs = sBox.ScrollTextBox(frame_instrs,self.recipe_instrs) # instructions are listed in a scrollbox
+        scroll_text_istrs = sBox.ScrollTextBox(frame_instrs,self.recipe_instrs,self.color) # instructions are listed in a scrollbox
 
 
         self.protocol("WM_DELETE_WINDOW", closePage) # call the closePage function when the window is closed
