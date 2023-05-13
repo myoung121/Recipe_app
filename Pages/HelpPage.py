@@ -25,18 +25,15 @@ class Help(tk.Toplevel):
                 'search':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING),
                 'add':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING),
                 'recipe':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING),
-                'app_info':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING),
-                'logs':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING)
+                'app_info':ttk.LabelFrame(tab_parent,borderwidth=0,text=self.TABS_GREETING)
                 } # make tab frames
-        print(f'home page txt = {hTxt.getHomeTxt()}')
         # ADD INFO
         all_tabs = {
                     'home_info':sBox.ScrollTextBox(tab_labels['home'],hTxt.getHomeTxt(),self.BG_COLOR,numbered=False,set_bg_color=True),
                     'search_info':sBox.ScrollTextBox(tab_labels['search'], hTxt.getSearchTxt(),self.BG_COLOR,numbered=False,set_bg_color=True),
-                    'add_info':sBox.ScrollTextBox(tab_labels['add'], 'add info here'.split(),self.BG_COLOR,numbered=False,set_bg_color=True),
-                    'recipe_info':sBox.ScrollTextBox(tab_labels['recipe'], 'recipe info here'.split(),self.BG_COLOR,numbered=False,set_bg_color=True),
-                    'app_info_info':sBox.ScrollTextBox(tab_labels['app_info'], 'app_info info here'.split(),self.BG_COLOR,numbered=False,set_bg_color=True),
-                    'logs_info':sBox.ScrollTextBox(tab_labels['logs'], 'logs info here'.split(),self.BG_COLOR,numbered=False,set_bg_color=True)
+                    'add_info':sBox.ScrollTextBox(tab_labels['add'], hTxt.getAddTxt(),self.BG_COLOR,numbered=False,set_bg_color=True),
+                    'recipe_info':sBox.ScrollTextBox(tab_labels['recipe'], hTxt.getRecipeTxt(),self.BG_COLOR,numbered=False,set_bg_color=True),
+                    'app_info_info':sBox.ScrollTextBox(tab_labels['app_info'], hTxt.getAppInfoTxt(),self.BG_COLOR,numbered=False,set_bg_color=True)
                     }
 
 

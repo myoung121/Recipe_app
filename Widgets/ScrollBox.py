@@ -24,7 +24,6 @@ class ScrollTextBox(tk.Frame):
                  yscrollcommand=s_bar_vert.set) # create a Text widget and attach scrollbars
         if set_bg_color: # set a background color
             text_box_info.config(bg=self.BG_COLOR,fg='white')
-        print(f'text in scroll box build\n{text_iter}')
         # this widget is used for list and strings so have to check for that condition
         if isinstance(text_iter,(list,tuple)):
             for num,text in enumerate(text_iter): # insert the text
