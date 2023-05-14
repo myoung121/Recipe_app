@@ -3,9 +3,7 @@
 import random as ran
 import sqlite3
 from PIL import Image, ImageTk
-import  io
-
-
+import io
 
 
 """RETURN MULTIPLE RECIPE RECORDS"""
@@ -253,19 +251,6 @@ def toggleFav(recipe_id:int,db_connection)-> None:
 
 def addRecipe(db_connection,recipe_name:str,instructions,
               ingredients,cook_time_minutes=0,comment:str=''):
-    pre_load_checks ={'id_ok':False,'name_ok':False,
-                      'ingreds_ok' : False,'instrs_ok' : False,
-                      'cktime_ok' : False,'comment_ok': False
-                      } # checks must be passed be fore recipe is added
-    # CUSTOM EXCEPTIONS OUTPUT TEMPLATES
-    input_error_str = 'RECIPE INPUT ERROR: '
-    data_error_str = 'RECIPE DATA ERROR: '
-    class EntryError(Exception):
-        """INPUT ERRORS EXCEPTION WRAPPER"""
-        pass
-    class DataError(Exception):
-        """DATA LOAD,PREP, SEARCH, OTHER DATA ERRORS EXCEPTION WRAPPER"""
-        pass
 
     #########################################################
     # FUNCTIONS THAT ADD TO TABLES
@@ -287,7 +272,6 @@ def addRecipe(db_connection,recipe_name:str,instructions,
 
     def addRecipeInfo(db_connection1,record_values:tuple|str):
         """add values to columns recipe_id, recipe_name, instr, cook_time, comment, favorite to recipe table"""
-        print(record_values)
         execute_script = 'INSERT INTO Recipe(recipe_id, recipe_name, instr, cook_time, comment, favorite) VALUES'
         placeholders_str = "(" + '?,' * len(record_values)
         placeholders_str = placeholders_str[:-1] + ")"
@@ -297,6 +281,21 @@ def addRecipe(db_connection,recipe_name:str,instructions,
             db_connection1.execute(execute_script, (*record_values,))
             print(f'\t+{recipe_id} recipe info added +')
     #########################################################
+    pre_load_checks ={'id_ok':False,'name_ok':False,
+                      'ingreds_ok' : False,'instrs_ok' : False,
+                      'cktime_ok' : False,'comment_ok': False
+                      } # checks must be passed be fore recipe is added
+    # CUSTOM EXCEPTIONS OUTPUT TEMPLATES
+    input_error_str = 'RECIPE INPUT ERROR: '
+    data_error_str = 'RECIPE DATA ERROR: '
+    class EntryError(Exception):
+        """INPUT ERRORS EXCEPTION WRAPPER"""
+        pass
+    class DataError(Exception):
+        """DATA LOAD,PREP, SEARCH, OTHER DATA ERRORS EXCEPTION WRAPPER"""
+        pass
+
+
     #----------------------------------------------------------------------------------------
     # VALIDATE INPUTS
 

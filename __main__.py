@@ -4,7 +4,6 @@
 import logging
 import atexit
 import sys
-
 from application import MyApp
 
 APP_NAME = "RecipeApp"

@@ -71,8 +71,6 @@ class Add(
                 recipe_name = entry_recipe_name.get() # get recipe name (not null)
                 recipe_ingreds = l_box_ingreds.get(0,tk.END)  # get all ingredients (not null)
                 recipe_instrs = l_box_instrs.get(0, tk.END)  # get all instructions (not null)
-                print(f'{recipe_instrs}\n'
-                      f'{recipe_ingreds}')
                 if not recipe_name: # recipe name blank
                     error_message += 'RECIPE NAME BLANK/ '
                 if len(recipe_ingreds) == 0: # no ingredients in list

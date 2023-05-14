@@ -49,7 +49,7 @@ class Search(tk.Frame):
             global rows
             l_box_search.delete(0, tk.END) # clear the search display box
             if not entry_search_text.get():  # if user pressed enter with no entry text
-                checkBoxControl(chk_bx_recipe_id)  # set default search field to recipe id number
+                checkBoxControl(chk_bx_name)  # set default search field to recipe id number
                 rows = db_query_functions.getFilteredRecipes(search_txt='', db_connection_str=DB_STR,
                                                              user_filter=checkBoxStatus(),
                                                              return_all=True,  # return all recipes
@@ -132,7 +132,6 @@ class Search(tk.Frame):
                                                     db_connection_str=DB_STR)  # delete recipe from db
                     rows.pop(selected_item[0])  # delete recipe from stored recipe search
                     l_box_search.delete(selected_item[0])  # delete recipe from listbox
-                    print(f'deleted {recipe_db_id}-{recipe_name} -X')
             except IndexError:  # if delete button pressed while curser isnt on a recipe
                 pass
 

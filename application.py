@@ -2,12 +2,13 @@
 
 # skeleton code from https://www.geeksforgeeks.org/tkinter-application-to-switch-between-different-page-frames/
 import logging
+import os
 import tkinter as tk
 from Pages import HomePage,SearchPage, AddPage, RecipePage
 
 
 log = logging.getLogger(__name__)
-DB_STR = './food_stuff_tester.db' # database pathways
+DB_STR = os.path.join(".", "FOOD_STUFF.db")
 WINDOW_TITLE = 'CookBook'
 WINDOW_WIDTH = 830 # window width
 WINDOW_HEIGHT = 300 # window height
@@ -19,20 +20,16 @@ class MyApp:
     @staticmethod
     def run():
         class tkinterApp(tk.Tk):
-            """ setup main window
-            """
             frames = {}# global container
             def makeFrames(self, list_of_frames, frames_args:tuple,parent):  # build frames dict
                 # initializing frames to an empty array
                 frame_dict = {}
-                # iterating through a tuple consisting
-                # of the different page layouts
+                # iterating through  page layouts
                 for num,F in enumerate(list_of_frames):
                     # initializing frame of that object
                     frame = F(parent, self,frames_args[num])
                     frame_dict[F] = frame
                     frame.grid(row=0, column=0, sticky="nsew")
-                #print(frame_dict)
                 return frame_dict
 
             def __init__(self, *args, **kwargs):
@@ -61,8 +58,6 @@ class MyApp:
                 frame = self.frames[cont]
                 frame.tkraise()
 
-
-        # --------------------------------------------------------------------------------------------------------------------------------------------------------
         # Driver Code
         app = tkinterApp()
         app.mainloop()
