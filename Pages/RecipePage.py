@@ -16,15 +16,16 @@ class Recipe(tk.Toplevel):
     WINDOW_HEIGHT = '700' # window height
     LABEL_TEXT_FONT = ('Default',10) # window text font
     __bg_colors__ = tuple('#b2d3c2 #ebe1a1 #2c7564 #9e7b6f #524d5c #8f9ba6 '
-                          '#945d00 #ffb6c1 #ffeead #4b0082'.split(' ')) # poss background colors
-    __BG_COLORS2__ = tuple('#FFA07A #FFD700 #FF69B4 #9400D3 #FF8C00 ' 
-                           '#00FFFF #FF1493 #BA55D3 #32CD32 #FF4500'.split(' ')) # poss background colors
+                          '#945d00 #ffb6c1 #4b0082 #ffeead'.split(' ')) # poss background colors
     FAV_TEXT = u"\u2B50\uFE0F" # star emoji output when recipe is favorited
 
 
     def __init__(self, recipe_info:dict, recipe_image_blob:bytes,open_pages_tracker,db_connection_str):
         super().__init__()
-        #color_set = ran.choice((self.__bg_colors__,self.__bg_colors2__))
+        # recipe_info is all th info needed to build selected recipe window
+        # recipe_image_blob is the recipe image byte data
+        # open_pages_tracker tracks which recipe windows are open
+        # db_connection_str is the database location recipes are stored
         self.color = ran.choice(self.__bg_colors__) # pick a random background color for each instance
         self.text_color = 'black' # instance text color
         self.recipe_id = recipe_info['recipe_id'] # instance recipe id number
@@ -135,6 +136,6 @@ class Recipe(tk.Toplevel):
         scroll_text_istrs = sBox.ScrollTextBox(frame_instrs,self.recipe_instrs,self.color) # instructions are listed in a scrollbox
 
 
-        self.protocol("WM_DELETE_WINDOW", closePage) # call the closePage function when the window is closed
+        self.protocol("WM_DELETE_WINDOW", closePage) # call the closePage function when the window is closed no matter how
 
 

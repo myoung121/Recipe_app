@@ -12,6 +12,9 @@ class Search(tk.Frame):
 
     def __init__(self, parent, controller, page_info):
         tk.Frame.__init__(self, parent)
+        # parent is the root window
+        # controller switches the pages
+        # page_info is all info needed to build this page
         self.BG_COLOR =page_info['bg_color'] # page background color
         self.config(bg=self.BG_COLOR) # set page to color
         DB_STR = page_info['db_str'] # recipe database location

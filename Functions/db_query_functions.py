@@ -1,4 +1,5 @@
-import pprint
+"""DATABASE QUERY FUNCTIONS"""
+
 import random as ran
 import sqlite3
 from PIL import Image, ImageTk
@@ -7,55 +8,57 @@ import  io
 
 
 
-"""FUNCTIONS THAT RETURN RECIPE RECORD INFO"""
+"""RETURN MULTIPLE RECIPE RECORDS"""
 
-
-def getFilteredRecipes(search_txt, db_connection_str:str, excluded_ingreds:tuple =(),user_filter: str= 'name', return_all:bool=False):  # search box / toggle buttons
-    """can search by name, recipe_id, ingredient, instruction"""
+def getRowsAll(table_name: str, db_connection_str:str) -> list:
+    """ return all rows in a table """
+    execute_script = f'SELECT * FROM ' + str(table_name)
+    db_connection_str = sqlite3.connect(db_connection_str)
+    with db_connection_str:
+        all_rows = db_connection_str.execute(execute_script)
+    return all_rows.fetchall()
+def getFilteredRecipes(search_txt, db_connection_str:str, excluded_ingreds:tuple =(),
+                       user_filter: str= 'name', return_all:bool=False):
+    """returns recipes based off filter"""
     allowed_filters = ('name', 'recipe_id', 'ingredient', 'instruction')
     blank_box = False # if user press enter with empty search box
     if user_filter in allowed_filters:
-        db_connection_str = sqlite3.connect(db_connection_str)
+        db_connection_str = sqlite3.connect(db_connection_str) # connect to database
         execute_script = f'SELECT DISTINCT Recipe.recipe_id,recipe_name,prep_time,cook_time ' \
-                         f'FROM Recipe'
-        if user_filter == allowed_filters[0]:  # name
+                         f'FROM Recipe' # query base template
+        if user_filter == allowed_filters[0]:  # filter by name
             if return_all and excluded_ingreds:
                 blank_box = True
-                """execute_script += ' WHERE Recipe.recipe_id NOT IN ('
-                for ingred in excluded_ingreds:
-                    execute_script += f'SELECT RecipeIngredient.recipe_id ' \
-                                      'FROM RecipeIngredient ' \
-                                      'JOIN Ingredient ON RecipeIngredient.ingred_id=Ingredient.ingred_id ' \
-                                      f'WHERE Ingredient.ingred_name LIKE \'%{ingred}%\' UNION '
-                execute_script = execute_script.rstrip(' UNION ')
-                execute_script += ')'"""
-
             else:
                 search_txt = search_txt.replace(' ', '_')
+                # build rest of query
                 execute_script += ' WHERE recipe_name ' \
                                   'LIKE '
                 placeholder = f'\'%{search_txt.lower()}%\''
                 execute_script += placeholder
-        elif user_filter == allowed_filters[1]:  # recipe_id
+
+        elif user_filter == allowed_filters[1]:  # filter by recipe_id
             execute_script += ' WHERE recipe_id ' \
                               'LIKE '
             placeholder = f'\'%{search_txt}%\''
-            execute_script += placeholder
-        elif user_filter == allowed_filters[2]:  # ingredients
+            execute_script += placeholder # build rest of query
+
+        elif user_filter == allowed_filters[2]:  # filter byingredients
             execute_script += ' JOIN RecipeIngredient ON Recipe.recipe_id=RecipeIngredient.recipe_id ' \
                               'JOIN Ingredient ON RecipeIngredient.ingred_id=Ingredient.ingred_id ' \
                               'WHERE ingred_name ' \
                               'LIKE '
             placeholder = f'\'%{search_txt}%\''
-            execute_script += placeholder
-        elif user_filter == allowed_filters[3]:  # instructions
+            execute_script += placeholder # build rest of query
+
+        elif user_filter == allowed_filters[3]:  # filter by instructions
             execute_script += ' WHERE instr ' \
                               'LIKE '
             placeholder = f'\'%{search_txt}%\''
-            execute_script += placeholder
+            execute_script += placeholder # build rest of query
     else:
         exit(f'{user_filter} Filter not Allowed')
-    if excluded_ingreds:
+    if excluded_ingreds: # if user has banned ingredients in display
         if blank_box: # excluded ingreds and empty search box
             execute_script += ' WHERE Recipe.recipe_id NOT IN (' # expand query
         if not blank_box: # have user input ingred
@@ -67,44 +70,38 @@ def getFilteredRecipes(search_txt, db_connection_str:str, excluded_ingreds:tuple
                               f'WHERE Ingredient.ingred_name LIKE \'%{ingred}%\' UNION '
         execute_script = execute_script.rstrip(' UNION ') # clean extra
         execute_script += ')' # close for query
-
-    #print(execute_script)
+    # execute query
     with db_connection_str:
         values = db_connection_str.execute(execute_script)
         values = values.fetchall()
     return values
 
-
-def getRowsAll(table_name: str, db_connection_str:str) -> list:
-    """ return all rows in table """
-    execute_script = f'SELECT * FROM ' + str(table_name)
-    db_connection_str = sqlite3.connect(db_connection_str)
-    with db_connection_str:
-        all_rows = db_connection_str.execute(execute_script)
+def getFavorites(db_connection_str):
+    """returns favorite recipes"""
+    execute_script = 'SELECT recipe_id,recipe_name FROM Recipe WHERE favorite = True' # query to get favorite recipes from table
+    db_conn =  sqlite3.connect(db_connection_str)
+    with db_conn:
+        all_rows = db_conn.execute(execute_script)
     return all_rows.fetchall()
 
-def getImageRandom(db_connection_str:str,num_of_images:int=1,screen_sized=False,screen_w_h:tuple=(600,500))->list:
+def getImageRandom(db_connection_str:str,num_of_images:int=1)->list:
     """ return one or multiple random image names with images in jpeg format"""
     # get all image_ids
     execute_script = 'SELECT image_id from Image'
     db_connection = sqlite3.connect(db_connection_str)
     with db_connection:
-        image_ids = db_connection.execute(execute_script)
+        image_ids = db_connection.execute(execute_script) # get all image ids
     image_ids=image_ids.fetchall()
-    # get the number of random image_ids requested
-    ran_image_ids = ran.sample(image_ids,num_of_images)
-    # make new script to get images based on the selected image_ids
-    execute_script = 'SELECT image_name,image_blob FROM Image WHERE image_id IN '
+    ran_image_ids = ran.sample(image_ids,num_of_images)# get the number of random image_ids requested
+    execute_script = 'SELECT image_name,image_blob FROM Image WHERE image_id IN '# make new script to get images based on the selected image_ids
     # add placeholder for each image_id
     placeholders_str = "(" + '?,' * num_of_images
     placeholders_str = placeholders_str[:-1] + ")"
     # put the script together
     execute_script += placeholders_str
-    #db_connection_str = sqlite3.connect(db_connection_str)
     with db_connection:
-        random_images = db_connection.execute(execute_script,tuple(x[0] for x in ran_image_ids))
+        random_images = db_connection.execute(execute_script,tuple(x[0] for x in ran_image_ids))# get the images based off the ids
     random_images = random_images.fetchall()
-    #random_images = ran.sample(all_images,num_of_images)
     # convert binary images to images tkinter can use
     random_jpeg_images =[]
     for image_pair in random_images:
@@ -114,29 +111,22 @@ def getImageRandom(db_connection_str:str,num_of_images:int=1,screen_sized=False,
         sub_list.append(ImageTk.PhotoImage(pic))
         random_jpeg_images.append(tuple(sub_list))
     return random_jpeg_images
+#-----------------------------------------------------------------------------------------------------------------------
 
-def getFavorites(db_connection_str):
-    """get favorite recipes"""
-    execute_script = 'SELECT recipe_id,recipe_name FROM Recipe WHERE favorite = True' # query to get favorited recipes from table
-    db_conn =  sqlite3.connect(db_connection_str)
-    with db_conn:
-        all_rows = db_conn.execute(execute_script)
-    return all_rows.fetchall()
-# --------------------------------------------------------------
 
-""" FUNCTIONS THAT RETURN A SINGLE FORMATTED RECIPE RECORD / INFO"""
+"""RETURN A SINGLE RECORD """
 def getRecipeInfo(recipe_id: int, db_connection_str:str) -> (dict, bytes):  # show recipe button
+    """return all recipe info needed to build recipe page"""
     table_names: tuple = ('Recipe', 'RecipeIngredient', 'Image') # IMAGE MUST BE LAST!!!
-    recipe_info = {}
-    unique_ingreds = getRowsAll('Ingredient',db_connection_str)
-    db_connection = sqlite3.connect(db_connection_str)
-    for item_rows in table_names:
+    recipe_info = {} # all recipe record info
+    unique_ingreds = getRowsAll('Ingredient',db_connection_str) # all ingredients in the table / recipe ingredients are stored as ingred table id number
+    db_connection = sqlite3.connect(db_connection_str) # database connection
+    for item_rows in table_names: # collect record info from all tables
         try:
-
             execute_script_str = f'SELECT * ' \
                                  f'FROM  {item_rows} ' \
                                  f'WHERE recipe_id = {recipe_id}'
-            if item_rows == 'Recipe':
+            if item_rows == 'Recipe': # get info from recipe table
                 with db_connection:
                     stats = db_connection.execute(execute_script_str)
                     stats = stats.fetchall()[0]
@@ -149,21 +139,23 @@ def getRecipeInfo(recipe_id: int, db_connection_str:str) -> (dict, bytes):  # sh
                 recipe_info['created_time'] = stats[6]
                 recipe_info['updated_time'] = stats[7]
                 recipe_info['favorite'] = stats[8]
-            elif item_rows == 'RecipeIngredient':
+
+            elif item_rows == 'RecipeIngredient': # get recipe ingredients
                 recipe_info['ingredients'] = []
                 with db_connection:
                     stats = db_connection.execute(execute_script_str)
                     stats = stats.fetchall()
                 for num, food in enumerate(stats):
-                    recipe_info['ingredients'].append(unique_ingreds[int(food[1])][1])
-            elif item_rows == 'Image':
+                    recipe_info['ingredients'].append(unique_ingreds[int(food[1])][1]) # get ingredients name based off ingred table id numbers/index
+
+            elif item_rows == 'Image': # get recipe image
                 with db_connection:
                     stats = db_connection.execute(execute_script_str)
                     stats = stats.fetchall()[0]
                 recipe_info['image_name'] = stats[2].replace('_', " ").title()
                 image_blob = stats[3]
         except Exception as e:
-            if 'list index' in str(e): # ignore index error here. It throws if no image and is handled at end of iteration
+            if 'list index' in str(e): # ignore index error here. It throws if recipe has no image and is handled at end of iteration
                 pass
             else:
                 print(f'Error in getRecipeInfo():\n{e}')
@@ -178,36 +170,96 @@ def getRecipeInfo(recipe_id: int, db_connection_str:str) -> (dict, bytes):  # sh
 
 
 def getRecipeInfoRandom(db_connection_str:str) -> (dict, bytes):  # random recipe button
-    # todo - chech todo.txt
-    # get all recipe_ids in table
-    execute_script = 'SELECT recipe_id FROM Recipe'
-    db_connection = sqlite3.connect(db_connection_str)
+    execute_script = 'SELECT recipe_id FROM Recipe' # query
+    db_connection = sqlite3.connect(db_connection_str) # db connection
     with db_connection:
         all_ids = db_connection.execute(execute_script)
     all_ids = all_ids.fetchall()
     # pick a random recipe_id and get the id number alone
-    ran_recipe_num = ran.sample(all_ids,1)[0][0]
-    # pass recipe_id into function to get recipe info
-    return getRecipeInfo(recipe_id=ran_recipe_num, db_connection_str=db_connection_str)
+    ran_recipe_num = ran.sample(all_ids,1)[0][0] # pick a random recipe from id numbers
+    return getRecipeInfo(recipe_id=ran_recipe_num, db_connection_str=db_connection_str)# pass recipe_id into function to get recipe info
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+"""FUNCTIONS THAT RETURN TABLE INFO / CHECK COLUMN,TABLE INFO"""
+def getMaxIdNum(db_connection,column:str,table:str):
+    """return the highest id number(primary key)"""
+    execute_script = f"SELECT MAX({column}) FROM {table}" # script to get the highest number
+    db_connection = sqlite3.connect(db_connection) # connect to database
+    with db_connection:
+        highest_id_num = db_connection.execute(execute_script) # execute the command
+    return highest_id_num.fetchone()[0] # return the highest id number
+
+def validRecipeName(db_connection,recipe_name):
+    """"return True if recipe name already exist, else return False"""
+    execute_script = "SELECT recipe_id,recipe_name FROM Recipe WHERE recipe_name = ?"  # script to get recipe / recipe_name
+    db_connection = sqlite3.connect(db_connection)  # connect to database
+    recipe_name = recipe_name.lower().replace(' ','_')
+    with db_connection:
+        record = db_connection.execute(execute_script,(recipe_name,))  # execute the command
+    if record.fetchone():  # recipe name already exist
+        return False
+    else: # recipe name is unique
+        return True
+
+def isUniqueIngred(db_connection, ingredient):
+    """returns (True,None) if ingredient isn't in database, returns (False,ingred_id) if it is"""
+    execute_script = f'SELECT ingred_id FROM Ingredient WHERE ingred_name LIKE ?' # make the query
+    db_connection = sqlite3.connect(db_connection)  # connect to database
+    with db_connection:
+        results = db_connection.execute(execute_script,(str(ingredient.lower()),))  # execute the command
+    results = results.fetchone()
+    if results: # if ingrient is in database (not unique)
+        return False,results[0]
+    else: # ingredient is unique
+        return True,None
+
+# ----------------------------------------------------------------------------------------------------------------------
+"""FUNCTIONS THAT ALTER A RECORD"""
+
+def addComment(recipe_id:int,db_connection,comment:str)->None:
+    """add comment text to recipe record"""
+    execute_script = 'UPDATE Recipe ' \
+                     'SET comment=? ' \
+                     'WHERE recipe_id=?' # query
+    db_connection = sqlite3.connect(db_connection)
+    with db_connection:
+        db_connection.execute(execute_script,(str(comment),recipe_id))
+    print(f'+{recipe_id} comment updated+')
+
+def removeComment(recipe_id:int,db_connection)->None:
+    """sets recipe comment to empty string"""
+    print(f'+{recipe_id} comment removed +')
+    return addComment(recipe_id=recipe_id,db_connection=db_connection,comment='')
 
 
-# -------------------------------------------------------------------------------
+def toggleFav(recipe_id:int,db_connection)-> None:
+    """toggle recipe fav value between True and False"""
+    execute_script = f'SELECT favorite from Recipe WHERE recipe_id = {recipe_id}'# get current fav value
+    db_connection = sqlite3.connect(db_connection) # database connection
+    with db_connection:
+        current_fav_value = db_connection.execute(execute_script)
+    current_fav_value = current_fav_value.fetchall()[0][0] # current fav value
+    new_fav_value = not current_fav_value
+    execute_script = 'UPDATE Recipe ' \
+                     f'SET favorite = {new_fav_value} ' \
+                     f'WHERE recipe_id = {recipe_id}'
+    with db_connection:
+        db_connection.execute(execute_script) # execute
+    print(f'+{recipe_id} favorite updated+')
 
-"""FUNCTIONS THAT ALTER TABLE"""
+# ----------------------------------------------------------------------------------------------------------------------
+"""FUNCTIONS THAT ALTER A TABLE"""
 
 def addRecipe(db_connection,recipe_name:str,instructions,
-              ingredients,cook_time_minutes=0,comment:str='',favorite=True):
-
+              ingredients,cook_time_minutes=0,comment:str=''):
     pre_load_checks ={'id_ok':False,'name_ok':False,
-                      'ingred_ok' : False,'instrs_ok' : False,
+                      'ingreds_ok' : False,'instrs_ok' : False,
                       'cktime_ok' : False,'comment_ok': False
-                      }
-
-
-    # CUSTOM EXCEPTIONS
+                      } # checks must be passed be fore recipe is added
+    # CUSTOM EXCEPTIONS OUTPUT TEMPLATES
     input_error_str = 'RECIPE INPUT ERROR: '
     data_error_str = 'RECIPE DATA ERROR: '
-
     class EntryError(Exception):
         """INPUT ERRORS EXCEPTION WRAPPER"""
         pass
@@ -218,25 +270,24 @@ def addRecipe(db_connection,recipe_name:str,instructions,
     #########################################################
     # FUNCTIONS THAT ADD TO TABLES
     def addIngredient(db_connection1,ingred_id_ingred_pair:tuple|str):
-        #print('\tadding NEW ingred to Ingredient table...')
+        """ADD INGREDIENTS TO INGREDIENT TABLE"""
         execute_script = 'INSERT INTO Ingredient (ingred_id,ingred_name) VALUES (?,?)'
         db_connection1 = sqlite3.connect(db_connection1)
         with db_connection1:
             db_connection1.execute(execute_script,(*ingred_id_ingred_pair,))
-            print(f'\t+ ingredient added +')
+            print(f'\t+{recipe_id} ingredient added +')
 
     def addRecipeIngredient(db_connection1,recipe_ingred_ids_pair:tuple|str):
         """add recipe_id and ingred_id to database"""
-        #print('\tadding NEW recipe,ingred to RecipeIngredient table...')
         execute_script = 'INSERT INTO RecipeIngredient (recipe_id,ingred_id) VALUES (?,?)'
         db_connection1 = sqlite3.connect(db_connection1)
         with db_connection1:
             db_connection1.execute(execute_script,(*recipe_ingred_ids_pair,))
-            print(f'\t+ recipe ingredient added +')
+            print(f'\t+{recipe_id} recipe ingredient added +')
 
     def addRecipeInfo(db_connection1,record_values:tuple|str):
         """add values to columns recipe_id, recipe_name, instr, cook_time, comment, favorite to recipe table"""
-        #print('\tadding NEW recipe to Recipe table...')
+        print(record_values)
         execute_script = 'INSERT INTO Recipe(recipe_id, recipe_name, instr, cook_time, comment, favorite) VALUES'
         placeholders_str = "(" + '?,' * len(record_values)
         placeholders_str = placeholders_str[:-1] + ")"
@@ -244,32 +295,30 @@ def addRecipe(db_connection,recipe_name:str,instructions,
         db_connection1 = sqlite3.connect(db_connection1)
         with db_connection1:
             db_connection1.execute(execute_script, (*record_values,))
-            print(f'\t+ recipe info added +')
+            print(f'\t+{recipe_id} recipe info added +')
     #########################################################
     #----------------------------------------------------------------------------------------
     # VALIDATE INPUTS
 
     print('CHECKING RECIPE INFO...')
-    # CHECK RECIPE ID
+    # CHECK RECIPE ID - REQUIRED COLUMN
     recipe_id = getMaxIdNum(db_connection,'recipe_id','Recipe') + 1 # set the recipe_id to the largest recipe_id in table + 1
     try:
-        assert isinstance(recipe_id,int)
+        assert isinstance(recipe_id,int) # should be an int
         pre_load_checks['id_ok'] = True
-        print(f'\trecipe id-{recipe_id}-ok')
     except AssertionError:
         raise EntryError(input_error_str + 'RECIPE ID SHOULD BE AN INTEGER')
 
-    # CHECK RECIPE NAME
+    # CHECK RECIPE NAME - REQUIRED COLUMN
     if recipe_name:
         try:
-            assert isinstance(recipe_name,str)
-            recipe_name = recipe_name.lower()
+            assert isinstance(recipe_name,str) # must be a str
+            recipe_name = recipe_name.lower() # in lower case
         except AssertionError:
             raise EntryError(input_error_str + 'RECIPE NAME SHOULD BE A STRING')
         try:
-            assert validRecipeName(db_connection,recipe_name) == True
+            assert validRecipeName(db_connection,recipe_name) == True # check that recipe name is unique
             pre_load_checks['name_ok'] = True
-            print(f'\trecipe name-{recipe_name[:10]}-ok')
         except AssertionError:
             raise EntryError(input_error_str + 'RECIPE NAME ALREADY IN USE')
     else: # recipe name is blank
@@ -280,34 +329,33 @@ def addRecipe(db_connection,recipe_name:str,instructions,
         cook_time_minutes = 0
     try:
         cook_time_minutes = int(cook_time_minutes)
-        assert cook_time_minutes >=0
+        assert cook_time_minutes >=0 #MUST BE AN INT GREATER THAN OR EQUAL TO 0
         pre_load_checks['cktime_ok'] = True
-        print(f'\tcook time-{cook_time_minutes}-ok')
     except ValueError:
         raise EntryError(input_error_str + 'COOK TIME SHOULD BE AN INTEGER')
     except AssertionError:
         raise EntryError(input_error_str + 'COOK TIME SHOULD BE GREATER THAN 0 MINUTES')
 
     # CHECK COMMENT
-    if comment: # if user entered a comment
-        try:
-            assert isinstance(comment, str) # check if in correct data type
-            pre_load_checks['comment_ok'] = True
-            print(f'\tcomment-{comment[:10]}-ok')
-        except AssertionError:
-            raise EntryError(input_error_str + 'COMMENT SHOULD BE A STRING')
+    try:
+        assert isinstance(comment, str) # check if in correct data type
+        pre_load_checks['comment_ok'] = True
+    except AssertionError:
+        raise EntryError(input_error_str + 'COMMENT SHOULD BE A STRING')
+
 
     # CHECK INSTRUCTIONS
     try:
         assert isinstance(instructions,str)
+        #print(instructions)
+        instructions = instructions # input is show in stack in display
         pre_load_checks['instrs_ok'] = True
-        print(f'\tinstrs-{instructions[:10]}...-ok')
     except AssertionError:
         raise EntryError(input_error_str + 'INSTRUCTIONS SHOULD BE A STRING')
 
     # CHECK INGREDIENTS
     try:
-        assert isinstance(ingredients,tuple) # make sure ingedients are in tuple
+        assert isinstance(ingredients,tuple) # make sure ingredients are in tuple
     except AssertionError:
         raise EntryError(input_error_str + 'INGREDIENTS SHOULD BE IN A TUPLE')
     ingredients_ids = [] # store the ingred_id nums to add to database later
@@ -322,21 +370,28 @@ def addRecipe(db_connection,recipe_name:str,instructions,
         else:
             ingredients_ids.append(food_unique[1])  # add id num to list
     try:
-        ingreds_loadable = tuple(zip(ingredients_ids,ingredients))
+        ingreds_loadable = tuple(zip(ingredients_ids,ingredients)) # make sure every ingred has an id number and none are left out
         assert len(ingredients_ids) == len(ingreds_loadable)
+        ingreds_loadable = ingreds_loadable # input is show in stack in display
         pre_load_checks['ingreds_ok'] = True
-        print(f'\tingreds--ok')
     except AssertionError:
         raise DataError(data_error_str + 'COULDN\'T MATCH ALL INGREDIENTS TO IDS')
-
-    # ADD RECIPE INFO
+    #===================================================================================================================
+    # AFTER ALL CHECKS ARE PASSED
+    for check in pre_load_checks: # make sure all checks were passed
+        try:
+            assert pre_load_checks[check] == True
+        except AssertionError as e:
+            raise DataError(f'PRELOAD CHECKS NOT PASSED-{data_error_str}{e}\n{pre_load_checks}')
+    # ADD RECIPE INFO TO RECIPE TABLE
+    print('\tALL CHECKS PASSED')
     row_values = (recipe_id, recipe_name, instructions, cook_time_minutes, comment, True)
     try:
         addRecipeInfo(db_connection, row_values)
     except Exception as e:
         raise DataError(f'ADDING RECIPE INFO-{data_error_str}{e}')
 
-    # ADD INGREDIENTS
+    # ADD INGREDIENTS TO INGREDIENT TABLE
     for new_ingred_pair in ingreds_loadable: #
         if new_ingred_pair[0] > highest_ingred_id: # if ingred has new id number
             try:
@@ -344,95 +399,24 @@ def addRecipe(db_connection,recipe_name:str,instructions,
             except Exception as e:
                 raise DataError(f'ADDING INGREDIENTS-{data_error_str}{e}')
 
-    # ADD RECIPE INGREDIENTS
+    # ADD RECIPE INGREDIENTS TO RECIPEINGREDIENT TABLE ADD
     for item in ingreds_loadable:
         try:
             addRecipeIngredient(db_connection,(recipe_id,item[0])) # add to table using recipe_id,ingred_id
         except Exception as e:
             raise DataError(f'ADDING RECIPE INGREDIENTS-{data_error_str}{e}')
 
-    print('RECIPE SUCCESSFULLY ADDED')
+    print(f'\t+recipe {recipe_id} successfully added +')
     #----------------------------------------------------------------------------------------
 
 
 def deleteRecipe(recipe_id:int,db_connection_str:str):
     """delete recipe record from database"""
     db_connection_str = sqlite3.connect(db_connection_str)
-    delete_tables = ('Recipe','RecipeIngredient','Image')
+    delete_tables = ('Recipe','RecipeIngredient','Image') # look for recipe id in these tables
     for table in delete_tables:
         execute_script = f'DELETE FROM {str(table)} WHERE recipe_id={recipe_id}'
         with db_connection_str:
-            db_connection_str.execute(execute_script)
+            db_connection_str.execute(execute_script) # execute
+    print(f'+{recipe_id} deleted +')
 
-
-
-"""FUNCTIONS THAT ALTER A RECORD"""
-def addComment(recipe_id:int,db_connection,comment:str)->None:
-    # todo- should auto update the updated_at column
-    execute_script = 'UPDATE Recipe ' \
-                     'SET comment=? ' \
-                     'WHERE recipe_id=?'
-    db_connection = sqlite3.connect(db_connection)
-    with db_connection:
-        db_connection.execute(execute_script,(str(comment),recipe_id))
-    print('+comment updated+')
-
-def removeComment(recipe_id:int,db_connection)->None:
-    # todo- should auto update the updated_at column
-    return addComment(recipe_id=recipe_id,db_connection=db_connection,comment='')
-
-def toggleFav(recipe_id:int,db_connection)-> None:
-    """toggle recipe fav value between True and False"""
-    # get current fav value
-    execute_script = f'SELECT favorite from Recipe WHERE recipe_id = {recipe_id}'
-    db_connection = sqlite3.connect(db_connection)
-    with db_connection:
-        current_fav_value = db_connection.execute(execute_script)
-    current_fav_value = current_fav_value.fetchall()[0][0]
-    if current_fav_value:
-        new_fav_value = False
-    else:
-        new_fav_value = True
-    execute_script = 'UPDATE Recipe ' \
-                     f'SET favorite = {new_fav_value} ' \
-                     f'WHERE recipe_id = {recipe_id}'
-    with db_connection:
-        db_connection.execute(execute_script)
-    """if new_fav_value:
-        print('recipe favorited')
-    else:
-        print('recipe un-favorited')"""
-
-"""FUNCTIONS THAT RETURN TABLE INFO / CHECK COLUMN,TABLE INFO"""
-def getMaxIdNum(db_connection,column:str,table:str):
-    execute_script = f"SELECT MAX({column}) FROM {table}" # script to get the highest number
-    db_connection = sqlite3.connect(db_connection) # connect to database
-    with db_connection:
-        highest_id_num = db_connection.execute(execute_script) # execute the command
-
-    return highest_id_num.fetchone()[0] # return the highest recipe_id number
-
-def validRecipeName(db_connection,recipe_name):
-    execute_script = "SELECT recipe_id,recipe_name FROM Recipe WHERE recipe_name = ?"  # script to get recipe / recipe_name
-    db_connection = sqlite3.connect(db_connection)  # connect to database
-    recipe_name = recipe_name.lower().replace(' ','_')
-    with db_connection:
-        record = db_connection.execute(execute_script,(recipe_name,))  # execute the command
-    if record.fetchone():  # recipe name already exist
-        return False
-    else: # recipe name is unique
-        return True
-
-def isUniqueIngred(db_connection, ingredient):
-    """returns (True,None) if ingredient isnt in database, returns (False,ingred_id) if it is"""
-    execute_script = f'SELECT ingred_id FROM Ingredient WHERE ingred_name LIKE ?' # make the query
-    placeholder = ''
-    execute_script += placeholder
-    db_connection = sqlite3.connect(db_connection)  # connect to database
-    with db_connection:
-        results = db_connection.execute(execute_script,(str(ingredient.lower()),))  # execute the command
-    results = results.fetchone()
-    if results: # if ingrient is in database (not unique)
-        return False,results[0]
-    else: # ingredient is unique
-        return True,None

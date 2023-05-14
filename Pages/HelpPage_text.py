@@ -1,14 +1,13 @@
 """USER HELP/INFO SHOWN ON HELP PAGE"""
 
 
-navigation_widget_title = 'Navigation Bar (top right buttons on screen)'
-navigation_widget_desc = ('Go to different pages or quit the application.',)
-# explain what the navigation buttons do
+navigation_widget_title = 'Navigation Bar (top right buttons on screen)' # navigation bar title and location
+navigation_widget_desc = ('Go to different pages or quit the application.',)# navigation bar description
 navigation_widget_fields = {'Help Button': ('open the Help/Info window.',),
                            'Search Button': ('go to the Search Recipe page.',),
                            'Add Button': ('go to the Add Recipe page.',),
                            'Home Button': ('go to the Home page.',),
-                           'Quit Button': ('close the application.',)}
+                           'Quit Button': ('close the application.',)} # navigation bar button desc
 
 def makeTxtBlock(widget_title_location:str,widget_desc:tuple,fields:dict[str,tuple]):
     """returns widget info in a formatted string"""
@@ -72,7 +71,7 @@ def getSearchTxt():
                                                'Steps':('search by recipe steps / instructions',)})
     info_delete_button = makeTxtBlock(widget_title_location='Delete Recipe Button (center screen, left of Search Bar)',
                                        widget_desc=(
-                                       'Remove saved recipe and its image from database',
+                                       'opens pop-up asking to remove saved recipe and its image from database',
                                        'Doesnt remove the recipes ingredients form the database (others might need it)'),
                                        fields={'Delete Button': ('remove saved recipe and its image from database',)})
     info_search_bar = makeTxtBlock(widget_title_location='Recipe Search Bar (center screen below Recipe Search Filters)',
@@ -115,11 +114,13 @@ def getAddTxt():
                                                'Ingredients': ('add a ingredient to the recipe',
                                                                'press enter to add input',
                                                                'input is displayed to the right of entry',
-                                                               'each ingredient can only be added to a recipe once'),
+                                                               'each ingredient can only be added to a recipe once',
+                                                               'max ingredient character length is 100'),
                                                'Instructions': ('add instruction steps to the recipe',
                                                                 'press enter to add input',
                                                                 'input is displayed to the right of entry',
-                                                                'each step can only be added to a recipe once')})
+                                                                'each step can only be added to a recipe once',
+                                                                'max ingredient character length is 250')})
     info_ingreds_display = makeTxtBlock(widget_title_location='Ingredients Display (3rd column display area)',
                widget_desc=('display all added ingredients','remove an added ingredient',),
                fields={'Display': ('display all added ingredients',),

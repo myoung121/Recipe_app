@@ -18,19 +18,14 @@ class Home(tk.Frame):
         self.config(bg=self.BG_COLOR) # set page background to the background color
         self.width = int(page_info['win_size'].split('x')[0]) # get window width
         NUM_IMAGES = 3 # number of images to show on this page
-#-------------------------------------------------------
+        #---------------------------------------------------------------------------------------------------------------
         # FRAME
         frame_images = tk.Frame(self,padx=2,bg=self.BG_COLOR,width=self.width) # used as the main frame that holds the images in frames
         frame_images.grid(row=1,column=0,columnspan=3)
-        #  LABELS
-        lbl_title = tk.Label(self, text='cookbook app'.upper(),bg=self.BG_COLOR,fg='white') # welcome message
-        lbl_title.grid(row=0, column=1)
+        # --------------------------------------------------------------------------------------------------------------
         NavBar.NavBar(self,controller,2,self.BG_COLOR,('help','search','add','quit'))  # navigation frame / buttons
-
-
+        # --------------------------------------------------------------------------------------------------------------
         all_images_info = dbFuncs.getImageRandom(db_conn_str,num_of_images=NUM_IMAGES) # all random image names and images
-
-
         for num,i in enumerate(all_images_info): # attach images to page for all frames
             image_frame_text = all_images_info[num][0].replace("_"," ")
             if len(image_frame_text) > 30: # only show 30 chars

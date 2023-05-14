@@ -8,12 +8,17 @@ class ScrollTextBox(tk.Frame):
     # constructor
     def __init__(self,parent_frame:tk.LabelFrame,text_iter,bg_color,
                  numbered=True,set_bg_color=False,t_box_height_max = 15,t_box_width_max = 50):
+        # parent_frame is where the widget is placed
+        # text_iter is the text inserted into the display
+        # bg_color is the background color
+        # numbered sets if lines are printed with line numbers in display
+        # set_bg_color set if background color is applied to the display
         # t_box_height_max is the max number of lines to show
         # t_box_width_max is the max number of letters to show
         super().__init__()
-        self.t_box_width = t_box_width_max
-        self.t_box_height = t_box_height_max
-        self.BG_COLOR = bg_color
+        self.t_box_width = t_box_width_max # set text box width
+        self.t_box_height = t_box_height_max # set text box height
+        self.BG_COLOR = bg_color # set background color
 
         s_bar_hor = tk.Scrollbar(parent_frame, orient='horizontal',troughcolor=self.BG_COLOR,bg='white',bd=0)# create a horizontal scrollbar
         s_bar_hor.pack(side=tk.BOTTOM, fill=tk.X,pady=2,padx=1)# attach Scrollbar to text

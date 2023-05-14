@@ -1,3 +1,5 @@
+"""RUN TO START APP"""
+
 
 import logging
 import atexit
